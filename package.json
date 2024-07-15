@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://bruceminanga.github.io/BruceMinangaPortfolio/",
+  "homepage": "https://bruceminanga.github.io/BruceMinangaPortfolio-/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
