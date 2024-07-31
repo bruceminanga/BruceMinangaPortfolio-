@@ -1,5 +1,6 @@
 import React from "react";
 import { FaWhatsapp, FaTelegram, FaGithub, FaLinkedin } from "react-icons/fa";
+import { SiHackerrank } from "react-icons/si";
 import MovingEyes from "./MovingEyes"; // Make sure to import the new component
 
 const ProfileDetails = () => (
@@ -62,6 +63,13 @@ const ProfileDetails = () => (
           rel="noopener noreferrer"
         >
           <FaGithub className="text-2xl text-gray-800 hover:text-gray-900" />
+        </a>
+        <a
+          href="https://www.hackerrank.com/bruceminanga"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiHackerrank className="text-2xl text-green-600 hover:text-green-700" />
         </a>
       </div>
     </div>
