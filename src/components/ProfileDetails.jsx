@@ -49,20 +49,6 @@ const ProfileDetails = () => (
       </h3>
       <div className="flex space-x-4 mt-2">
         <a
-          href="https://wa.me/+254705071138"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaWhatsapp className="text-2xl text-green-500 hover:text-green-600" />
-        </a>
-        <a
-          href="https://t.me/bruceminanga"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaTelegram className="text-2xl text-blue-500 hover:text-blue-600" />
-        </a>
-        <a
           href="https://www.linkedin.com/in/bruce-minanga-768a55240/"
           target="_blank"
           rel="noopener noreferrer"
