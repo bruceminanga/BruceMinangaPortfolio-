@@ -26,9 +26,9 @@ const ProfileDetails = () => (
 
     <div className="mb-4">
       <h3>
-        -My current strengths lie in Linux system administration and web
-        development, where I specialize in using Python with Django, JavaScript,
-        and the React library.
+        -My strengths lie in Linux system administration and web development,
+        where I specialize in using Python with Django, JavaScript, and the
+        React library.
       </h3>
     </div>
     <div className="mb-4">
