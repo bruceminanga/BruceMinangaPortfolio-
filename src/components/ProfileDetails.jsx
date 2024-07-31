@@ -1,5 +1,6 @@
 import React from "react";
 import { FaWhatsapp, FaTelegram, FaGithub, FaLinkedin } from "react-icons/fa";
+import MovingEyes from "./MovingEyes"; // Make sure to import the new component
 
 const ProfileDetails = () => (
   <div className="max-w-md mx-auto mt-4 bg-white rounded-lg overflow-hidden shadow-lg p-6">
@@ -45,7 +46,7 @@ const ProfileDetails = () => (
         On+Spread Joy.
       </p>
       <h3 className="font-bold text-lg mb-2" style={{ color: "#005675" }}>
-        Spy on me via 👀:
+        Spy on me via <MovingEyes />:
       </h3>
       <div className="flex space-x-4 mt-2">
         <a

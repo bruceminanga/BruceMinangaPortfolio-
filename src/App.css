@@ -40,3 +40,13 @@
 .read-the-docs {
   color: #888;
 }
+
+/* moving eyes */
+@keyframes blink {
+  0%, 96%, 98% { transform: scaleY(1); }
+  97% { transform: scaleY(0.1); }
+}
+
+.eye {
+  animation: blink 4s infinite;
+}
