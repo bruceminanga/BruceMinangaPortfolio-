@@ -15,7 +15,7 @@ import teachingImage from "../../assets/images/teaching.jpg";
 import familyTimeImage from "../../assets/images/family-time.jpg";
 import myLogo from "../../assets/images/My-logo.jpg";
 
-export const catalogItems = {
+export const MyServicesItems = {
   professional: [
     {
       id: "logo-maker",
@@ -148,7 +148,7 @@ Unlike other tech sellers, we offer free basic desktop support after you become 
   ],
 };
 
-const CatalogPage = () => {
+const MyServicesPage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -291,7 +291,7 @@ const CatalogPage = () => {
         <Link to="/" className="text-gray-600">
           <ChevronLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-xl font-semibold ml-4">Bruce's Catalog</h1>
+        <h1 className="text-xl font-semibold ml-4">Bruce's Services</h1>
       </div>
 
       <div className="p-4">
@@ -313,7 +313,7 @@ const CatalogPage = () => {
           </p>
         </div>
 
-        {Object.entries(catalogItems).map(([category, items]) => (
+        {Object.entries(MyServicesItems).map(([category, items]) => (
           <div key={category} className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold">
@@ -336,4 +336,4 @@ const CatalogPage = () => {
   );
 };
 
-export default CatalogPage;
+export default MyServicesPage;

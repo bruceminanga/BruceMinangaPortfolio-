@@ -3,8 +3,8 @@ import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import TechLoading from "./components/TechLoading";
 import ProfileCard from "./components/ProfileCard";
 import ProfileDetails from "./components/ProfileDetails";
-import CatalogPage from "./components/catalogpage/CatalogPage";
-import CategoryPage from "./components/catalogpage/CategoryPage";
+import MyServicesPage from "./components/MyServices/MyServicesPage";
+import CategoryPage from "./components/MyServices/CategoryPage";
 import "./index.css";
 
 function App() {
@@ -34,7 +34,7 @@ function App() {
                   </>
                 }
               />
-              <Route path="/catalog" element={<CatalogPage />} />
+              <Route path="/MyServices" element={<MyServicesPage />} />
               <Route path="/category/:category" element={<CategoryPage />} />
             </Routes>
           </div>
