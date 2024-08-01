@@ -15,7 +15,7 @@ import teachingImage from "../../assets/images/teaching.jpg";
 import familyTimeImage from "../../assets/images/family-time.jpg";
 import myLogo from "../../assets/images/My-logo.jpg";
 
-const MyServicesItems = {
+export const MyServicesItems = {
   professional: [
     {
       id: "logo-maker",
@@ -319,11 +319,14 @@ const MyServicesPage = () => {
               <h3 className="text-xl font-semibold">
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </h3>
-              <Link to="/see-all" className="text-blue-500 text-sm font-medium">
+              <Link
+                to={`/category/${category}`}
+                className="text-blue-500 text-sm font-medium"
+              >
                 See all
               </Link>
             </div>
-            {renderItemList(items)}
+            {renderItemList(items.slice(0, 3))}
           </div>
         ))}
       </div>
