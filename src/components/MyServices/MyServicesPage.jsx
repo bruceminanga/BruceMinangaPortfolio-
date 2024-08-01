@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import ImageCarousel from "./ImageCarousel";
 
 // Note: Replace these with your actual image imports
 import logoMakerImage from "../../assets/images/logomaker.jpg";
@@ -14,6 +15,14 @@ import swimmingImage from "../../assets/images/swimming.jpg";
 import teachingImage from "../../assets/images/teaching.jpg";
 import familyTimeImage from "../../assets/images/family-time.jpg";
 import myLogo from "../../assets/images/My-logo.jpg";
+
+const formatDescription = (text) => {
+  return text
+    .split("*")
+    .map((part, index) =>
+      index % 2 === 0 ? part : <strong key={index}>{part}</strong>
+    );
+};
 
 export const MyServicesItems = {
   professional: [
@@ -30,7 +39,7 @@ export const MyServicesItems = {
     },
     {
       id: "tech-lead",
-      title: "Tech Lead And Tech Sales Representative",
+      title: "Tech Lead & Tech Sales Representative",
       description:
         "In September of 2023, I started to sell technology products/services to customers. I have the follow",
       fullDescription: `In September of 2023, I started to sell technology products/services to customers. I have the following gadgets for sell:
@@ -82,11 +91,26 @@ Unlike other tech sellers, we offer free basic desktop support after you become 
     },
     {
       id: "software-engineering",
-      title: "Software Engineering & IT",
+      title: "Software Engineering & IT Operations",
       description:
-        "In September of 2023, I started to focus on software engineering and IT projects.",
-      fullDescription:
-        "In September of 2023, I started to focus on software engineering and IT projects. This includes web development, mobile app development, and various IT solutions.",
+        "In September of 2023, I started to focus on software engineering and IT Operation.",
+      fullDescription: `In September of 2023, I started to provide the following services:
+
+*Web Development Services:* I charge according to your website's complexity.
+-Order now and get free access to my services @BruceMinangas.world
+*My achievements as a web developer*
+1. Designed 2 websites achieving 95% client satisfaction rate.
+
+*IT Operations.* They include:
+1. Software Installations and maintenance.
+-Latest Windows software (windows 10,11, office 2021,Antivirus)=ksh700 each
+-Windows and office activation=ksh500 each
+2. Troubleshooting your computer.
+-Fixing software issue=ksh500
+-Computer repair=The price will vary based on the extent of damage to your device.
+
+Unlike other local people who fix clients machines:
+-I explain honestly whats wrong with clients machine and fix them permanently which in the long term saves clients money.`,
       images: [softwareEngineeringImage],
     },
   ],
@@ -95,27 +119,68 @@ Unlike other tech sellers, we offer free basic desktop support after you become 
       id: "monsters",
       title: "Monsters",
       description: "In January of 2024, I'm creating content about monsters.",
-      fullDescription:
-        "In January of 2024, I'm creating content about monsters, exploring various mythologies and modern interpretations.",
+      fullDescription: `In January of 2024, I'm creating my world(BruceMinangasWorld). In this world, I'm the god, shaping it with good intentions and positive actions. I'm conducting myself well in my world and taking care of the welfare of all beings within it.
+
+Unlike other gods:
+-I'm encouraging my followers to create their worlds and be god like me. This helps them understand true nature of god and the benefits that come with it. (I'm not jealous).
+-It's okey for people who can't handle being a god to worship a god of their choice or none (True Free Will).
+
+-I'm open to collaboration with other gods to learn more from them because I'm not all-knowing.
+
+-If you are mature enough, you would easily understand these concepts
+
+It's who I am.`,
       images: [monstersImage],
     },
     {
       id: "philosophy",
-      title: "Philosophy, Psychology And Spirituality",
+      title: "Philosophy, Psychology & History",
       description:
-        "In September of 2023, I started to explore philosophy, psychology, and spirituality.",
-      fullDescription:
-        "In September of 2023, I started to explore philosophy, psychology, and spirituality, delving into various schools of thought and practices.",
+        "In September of 2023, I started to learn philosophy, psychology",
+      fullDescription: `In September of 2023, I started to learn philosophy. It is helping me rewire my brain and help me get out of inappropriate social constructs. On the other hand, psychology makes human lives better and history makes us know where we came from and where we are heading to.
+*Here are my true findings:*
+1. Philosophers can be wrong; they present to you their thoughts 🤷🏽‍♂️
+2. It's easier to understand people's thoughts when you are a philosopher.
+3. Philosophers run the world. 
+
+*My best philosophical concepts:*
+1. Solipsism: You and only you exist.
+2. Empiricism: The source of human knowledge is experience.
+3. Rationalism: Reason and logic are the primary sources of knowledge and truth.
+4. Resilience & Stoicism. Ability to endure Destructions
+
+*My best psychological concepts:*
+1. Halo effect. Judgment based on looks 
+2. Habituation. Disliking repetitive tasks. 
+
+*Psychological concepts I can't entirely agree fully with:*
+1. Synchronicity. Coincidences
+
+*Horror history:*
+1. Dark ages. A period between 5th-15th century.
+
+I am selling each package of a successful philosophical solution (Intellectual property) at ksh500.`,
       price: "KES 500.00",
       images: [philosophyImage],
     },
     {
       id: "research",
-      title: "Research & Did You Know",
+      title: "Research & Did You Know Phrase",
       description:
-        "In September of 2023, I'm intensifying my research efforts.",
-      fullDescription:
-        "In September of 2023, I'm intensifying my research efforts, focusing on cutting-edge technologies and scientific discoveries.",
+        "In September of 2023, I'm intensly starting to get involced in reasearch.",
+      fullDescription: `In September of 2023, i'm intensively starting to get involved in the following research
+1️⃣Life pattern recognition, pattern utilisation and pattern creation. 
+My project called Life Framework has 3 sections: 
+-| Health and Awareness
+-| Relationships=Pleasures
+-| Work=Contribution To Society
+2️⃣Technological research
+
+🎒Personal🎒
+Did you know:
+1️⃣I regularly update my Portfolio
+
+Subscribe to BruceMinangas.world to learn more of my research`,
       price: "KES 3,000.00",
       images: [researchImage],
     },
@@ -123,26 +188,30 @@ Unlike other tech sellers, we offer free basic desktop support after you become 
   hobbies: [
     {
       id: "swimming",
-      title: "Swimming, Driving, Cycling",
+      title: "Swimming, Driving, Cycling & Flying",
       description: "This is how I explore the world.",
-      fullDescription:
-        "Swimming, driving, and cycling are my favorite ways to explore the world and stay active.",
+      fullDescription: `This is how i explore the world with like minded individuals.
+
+As a child, my parents gently bathed me in a warm basin. It was fun. As a grown-up, I upgraded to a heated swimming pool. It's fun.`,
       images: [swimmingImage],
     },
     {
       id: "teaching",
       title: "Teaching & Public speaking",
       description: "I love to spread the knowledge I have.",
-      fullDescription:
-        "Teaching and public speaking allow me to share my knowledge and experiences with others, fostering growth and learning.",
+      fullDescription: `I love to spread the knowledge i gained throughout my work to the world. Currently, i do teach and charge ksh100 per hour. I do teach the following:
+1️⃣Programming
+You can also Hire me as a public speaker to talk about science, technology and engineering.
+I charge ksh3000 per hour. Transport Cost Not Included.`,
       images: [teachingImage],
     },
     {
       id: "family-time",
-      title: "Spending Time With Family",
+      title: "Spending Time With Family & Friends",
       description: "To all my family (My Mom and Dad).",
-      fullDescription:
-        "Family time is precious to me. I cherish the moments spent with my Mom, Dad, and other family members.",
+      fullDescription: `To all my family (My Mom and Dad in particular) and friends who gave me support and care throughout my dream endeavours, I am highly grateful. I would be nothing without you. Peace ✌️
+
+Don't forget to subscribe @BruceMinangas.world to get free support system`,
       images: [familyTimeImage],
     },
   ],
@@ -150,28 +219,12 @@ Unlike other tech sellers, we offer free basic desktop support after you become 
 
 const MyServicesPage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const handleItemClick = useCallback((item) => {
     setSelectedItem(item);
-    setCurrentImageIndex(0);
     setShowFullDescription(false);
   }, []);
-
-  const handleImageNavigation = useCallback(
-    (direction) => {
-      setCurrentImageIndex((prev) => {
-        const newIndex =
-          direction === "next"
-            ? (prev + 1) % selectedItem.images.length
-            : (prev - 1 + selectedItem.images.length) %
-              selectedItem.images.length;
-        return newIndex;
-      });
-    },
-    [selectedItem]
-  );
 
   const toggleDescription = useCallback(() => {
     setShowFullDescription((prev) => !prev);
@@ -210,33 +263,12 @@ const MyServicesPage = () => {
     [handleItemClick]
   );
 
-  const renderDetailView = useCallback(
-    () => (
+  const renderDetailView = useCallback(() => {
+    if (!selectedItem) return null;
+    return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="relative h-64 bg-gray-100">
-            <img
-              src={selectedItem.images[currentImageIndex]}
-              alt={selectedItem.title}
-              className="w-full h-full object-cover"
-            />
-            {selectedItem.images.length > 1 && (
-              <>
-                <button
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md"
-                  onClick={() => handleImageNavigation("prev")}
-                >
-                  <ChevronLeft className="text-gray-600" />
-                </button>
-                <button
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md"
-                  onClick={() => handleImageNavigation("next")}
-                >
-                  <ChevronRight className="text-gray-600" />
-                </button>
-              </>
-            )}
-          </div>
+          <ImageCarousel images={selectedItem.images} />
           <div className="p-6 flex-grow overflow-y-auto">
             <h2 className="text-2xl font-bold mb-2">{selectedItem.title}</h2>
             {selectedItem.price && (
@@ -245,10 +277,12 @@ const MyServicesPage = () => {
               </p>
             )}
             <div className="mb-4">
-              <p className="text-gray-700">
-                {showFullDescription
-                  ? selectedItem.fullDescription
-                  : selectedItem.description}
+              <p className="text-gray-700 whitespace-pre-line">
+                {formatDescription(
+                  showFullDescription
+                    ? selectedItem.fullDescription
+                    : selectedItem.description
+                )}
               </p>
             </div>
             {selectedItem.fullDescription && (
@@ -275,15 +309,8 @@ const MyServicesPage = () => {
           </div>
         </div>
       </div>
-    ),
-    [
-      selectedItem,
-      currentImageIndex,
-      showFullDescription,
-      handleImageNavigation,
-      toggleDescription,
-    ]
-  );
+    );
+  }, [selectedItem, showFullDescription, toggleDescription]);
 
   return (
     <div className="max-w-2xl mx-auto bg-gray-100 min-h-screen">

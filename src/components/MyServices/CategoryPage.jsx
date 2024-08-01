@@ -1,16 +1,24 @@
 import React, { useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import ImageCarousel from "./ImageCarousel"; // Make sure this path is correct
 import { MyServicesItems } from "./MyServicesPage";
 
 const ITEMS_PER_PAGE = 3;
+
+const formatDescription = (text) => {
+  return text
+    .split("*")
+    .map((part, index) =>
+      index % 2 === 0 ? part : <strong key={index}>{part}</strong>
+    );
+};
 
 const CategoryPage = () => {
   const { category } = useParams();
   const items = MyServicesItems[category] || [];
   const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const loadMore = useCallback(() => {
@@ -21,24 +29,8 @@ const CategoryPage = () => {
 
   const handleItemClick = useCallback((item) => {
     setSelectedItem(item);
-    setCurrentImageIndex(0);
     setShowFullDescription(false);
   }, []);
-
-  const handleImageNavigation = useCallback(
-    (direction) => {
-      if (!selectedItem) return;
-      setCurrentImageIndex((prev) => {
-        const newIndex =
-          direction === "next"
-            ? (prev + 1) % selectedItem.images.length
-            : (prev - 1 + selectedItem.images.length) %
-              selectedItem.images.length;
-        return newIndex;
-      });
-    },
-    [selectedItem]
-  );
 
   const toggleDescription = useCallback(() => {
     setShowFullDescription((prev) => !prev);
@@ -49,29 +41,7 @@ const CategoryPage = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="relative h-64 bg-gray-100">
-            <img
-              src={selectedItem.images[currentImageIndex]}
-              alt={selectedItem.title}
-              className="w-full h-full object-cover"
-            />
-            {selectedItem.images.length > 1 && (
-              <>
-                <button
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md"
-                  onClick={() => handleImageNavigation("prev")}
-                >
-                  <ChevronLeft className="text-gray-600" />
-                </button>
-                <button
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md"
-                  onClick={() => handleImageNavigation("next")}
-                >
-                  <ChevronRight className="text-gray-600" />
-                </button>
-              </>
-            )}
-          </div>
+          <ImageCarousel images={selectedItem.images} />
           <div className="p-6 flex-grow overflow-y-auto">
             <h2 className="text-2xl font-bold mb-2">{selectedItem.title}</h2>
             {selectedItem.price && (
@@ -80,10 +50,12 @@ const CategoryPage = () => {
               </p>
             )}
             <div className="mb-4">
-              <p className="text-gray-700">
-                {showFullDescription
-                  ? selectedItem.fullDescription
-                  : selectedItem.description}
+              <p className="text-gray-700 whitespace-pre-line">
+                {formatDescription(
+                  showFullDescription
+                    ? selectedItem.fullDescription
+                    : selectedItem.description
+                )}
               </p>
             </div>
             {selectedItem.fullDescription && (
@@ -111,13 +83,7 @@ const CategoryPage = () => {
         </div>
       </div>
     );
-  }, [
-    selectedItem,
-    currentImageIndex,
-    showFullDescription,
-    handleImageNavigation,
-    toggleDescription,
-  ]);
+  }, [selectedItem, showFullDescription, toggleDescription]);
 
   return (
     <div className="max-w-4xl mx-auto bg-gray-100 min-h-screen">
