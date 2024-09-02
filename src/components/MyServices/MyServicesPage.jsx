@@ -1,5 +1,11 @@
-import React, { useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Routes,
+  useParams,
+} from "react-router-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import ImageCarousel from "./ImageCarousel";
 
@@ -118,16 +124,16 @@ Unlike other local people who fix clients machines:
     {
       id: "monsters",
       title: "Monsters",
-      description: "In January of 2024, I'm creating content about monsters.",
+      description: "In January of 2024, I'm creating my world.",
       fullDescription: `In January of 2024, I'm creating my world(BruceMinangasWorld). In this world, I'm the god, shaping it with good intentions and positive actions. I'm conducting myself well in my world and taking care of the welfare of all beings within it.
 
 Unlike other gods:
--I'm encouraging my followers to create their worlds and be god like me. This helps them understand true nature of god and the benefits that come with it. (I'm not jealous).
+-I'm encouraging my followers to create their worlds and be god like me. This helps them understand true nature of god and the benefits that come with it. (I'm not jealous, i co-operate).
 -It's okey for people who can't handle being a god to worship a god of their choice or none (True Free Will).
 
 -I'm open to collaboration with other gods to learn more from them because I'm not all-knowing.
 
--If you are mature enough, you would easily understand these concepts
+-If you are mature enough, you would easily understand the concept of Spiritual independence:(Developing one's own beliefs and values, rather than simply adopting those of family or society.)
 
 It's who I am.`,
       images: [monstersImage],
@@ -217,100 +223,131 @@ Don't forget to subscribe @BruceMinangas.world to get free support system`,
   ],
 };
 
-const MyServicesPage = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
+const ItemDetailView = () => {
+  const { category, id } = useParams();
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const detailViewRef = useRef(null);
 
-  const handleItemClick = useCallback((item) => {
-    setSelectedItem(item);
-    setShowFullDescription(false);
-  }, []);
+  const selectedItem = MyServicesItems[category].find((item) => item.id === id);
 
   const toggleDescription = useCallback(() => {
     setShowFullDescription((prev) => !prev);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (detailViewRef.current) {
+        setScrollPosition(detailViewRef.current.scrollTop);
+      }
+    };
+
+    const detailView = detailViewRef.current;
+    if (detailView) {
+      detailView.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (detailView) {
+        detailView.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
+  if (!selectedItem) return <div>Item not found</div>;
+
+  const imageHeight = 300;
+  const scrollThreshold = 100;
+
+  const imageStyle = {
+    height: `${Math.max(0, imageHeight - scrollPosition)}px`,
+    opacity: Math.max(0, 1 - scrollPosition / scrollThreshold),
+    transition: "height 0.3s ease-out, opacity 0.3s ease-out",
+  };
+
+  return (
+    <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col mx-auto mt-4">
+      <div
+        ref={detailViewRef}
+        className="flex-grow overflow-y-auto"
+        style={{ maxHeight: "calc(90vh - 60px)" }}
+      >
+        <div style={imageStyle} className="overflow-hidden">
+          <ImageCarousel images={selectedItem.images} />
+        </div>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-2">{selectedItem.title}</h2>
+          {selectedItem.price && (
+            <p className="text-xl font-semibold mb-2 text-blue-600">
+              {selectedItem.price}
+            </p>
+          )}
+          <div className="mb-4">
+            <p className="text-gray-700 whitespace-pre-line">
+              {formatDescription(
+                showFullDescription
+                  ? selectedItem.fullDescription
+                  : selectedItem.description
+              )}
+            </p>
+          </div>
+          {selectedItem.fullDescription && (
+            <button
+              className="text-blue-500 underline"
+              onClick={toggleDescription}
+            >
+              {showFullDescription ? "Read less" : "Read more"}
+            </button>
+          )}
+          {selectedItem.referral && (
+            <p className="text-sm text-blue-500 mt-2">
+              {selectedItem.referral}
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="p-4 border-t">
+        <Link to="/">
+          <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300">
+            Back to Services
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+const MyServicesPage = () => {
   const renderItemList = useCallback(
-    (items) => (
+    (items, category) => (
       <div className="mt-4 space-y-4">
         {items.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center p-3 bg-white rounded-lg shadow-md cursor-pointer transition-all duration-300 hover:shadow-lg"
-            onClick={() => handleItemClick(item)}
-          >
-            <img
-              src={item.images[0]}
-              alt={item.title}
-              className="w-16 h-16 rounded-lg object-cover"
-            />
-            <div className="ml-4 flex-grow">
-              <h4 className="font-semibold text-lg">{item.title}</h4>
-              <p className="text-sm text-gray-600">
-                {item.description.substring(0, 50)}...
-              </p>
-              {item.price && (
-                <p className="text-sm font-semibold text-blue-600 mt-1">
-                  {item.price}
+          <Link key={item.id} to={`/${category}/${item.id}`}>
+            <div className="flex items-center p-3 bg-white rounded-lg shadow-md cursor-pointer transition-all duration-300 hover:shadow-lg">
+              <img
+                src={item.images[0]}
+                alt={item.title}
+                className="w-16 h-16 rounded-lg object-cover"
+              />
+              <div className="ml-4 flex-grow">
+                <h4 className="font-semibold text-lg">{item.title}</h4>
+                <p className="text-sm text-gray-600">
+                  {item.description.substring(0, 50)}...
                 </p>
-              )}
+                {item.price && (
+                  <p className="text-sm font-semibold text-blue-600 mt-1">
+                    {item.price}
+                  </p>
+                )}
+              </div>
+              <ChevronRight className="text-gray-400" />
             </div>
-            <ChevronRight className="text-gray-400" />
-          </div>
+          </Link>
         ))}
       </div>
     ),
-    [handleItemClick]
+    []
   );
-
-  const renderDetailView = useCallback(() => {
-    if (!selectedItem) return null;
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
-          <ImageCarousel images={selectedItem.images} />
-          <div className="p-6 flex-grow overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-2">{selectedItem.title}</h2>
-            {selectedItem.price && (
-              <p className="text-xl font-semibold mb-2 text-blue-600">
-                {selectedItem.price}
-              </p>
-            )}
-            <div className="mb-4">
-              <p className="text-gray-700 whitespace-pre-line">
-                {formatDescription(
-                  showFullDescription
-                    ? selectedItem.fullDescription
-                    : selectedItem.description
-                )}
-              </p>
-            </div>
-            {selectedItem.fullDescription && (
-              <button
-                className="text-blue-500 underline"
-                onClick={toggleDescription}
-              >
-                {showFullDescription ? "Read less" : "Read more"}
-              </button>
-            )}
-            {selectedItem.referral && (
-              <p className="text-sm text-blue-500 mt-2">
-                {selectedItem.referral}
-              </p>
-            )}
-          </div>
-          <div className="p-4 border-t">
-            <button
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300"
-              onClick={() => setSelectedItem(null)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }, [selectedItem, showFullDescription, toggleDescription]);
 
   return (
     <div className="max-w-2xl mx-auto bg-gray-100 min-h-screen">
@@ -353,14 +390,13 @@ const MyServicesPage = () => {
                 See all
               </Link>
             </div>
-            {renderItemList(items.slice(0, 3))}
+            {renderItemList(items.slice(0, 3), category)}
           </div>
         ))}
       </div>
-
-      {selectedItem && renderDetailView()}
     </div>
   );
 };
 
 export default MyServicesPage;
+export { ItemDetailView };

@@ -6,36 +6,39 @@ import MovingEyes from "./MovingEyes"; // Make sure to import the new component
 const ProfileDetails = () => (
   <div className="max-w-md mx-auto mt-4 bg-white rounded-lg overflow-hidden shadow-lg p-6">
     <p>
-      Hi👋 I'm Bruce, the IT guy & the owner of BruceMiningas.world, Let me
-      bring your digital dreams to life(He/him)
+      👋 Hi, I'm Bruce the IT guy, Full-Stack Developer, Linux SysAdmin, Tech
+      Philosopher and the Owner of BruceMinangas.world. I Offer:
     </p>
+
     <div className="mb-4">
-      <h3 className="font-bold">UseCase:</h3>
-      <p>
-        -If you text/call & I'm unavailable, Easy! I'll get back to you shortly
-      </p>
-    </div>
-    <div className="mb-4">
-      <h3>⚡Fun fact: I'm here to help because why not? I can help with:</h3>
       <ul className="list-disc list-inside">
-        <li>Website Development since 2020</li>
-        <li>SysAdmin/DevOps Engineering since 2019</li>
-        <li>Data Science since 2024</li>
-        <li>Sharing Systems @BruceMinangas.world since 2024</li>
+        <li>
+          Web & Android App Development (2019-present) Frontend: JavaScript
+          (React), CSS (Bootstrap, Tailwind CSS) Backend: Python (Django)
+        </li>
+        <li>Linux SysAdmin & DevOps (2020-present) Docker/Podman expertise</li>
       </ul>
     </div>
 
     <div className="mb-4">
-      <h3>
-        -My strengths lie in Linux system administration and web development,
-        where I specialize in using Python with Django, JavaScript, and the
-        React library.
-      </h3>
+      <h3 className="font-bold text-lg mb-2">My Strategy</h3>
+      <p>
+        I blend technical expertise with a deep understanding of philosophical
+        concepts in tech. This unique perspective allows me to approach problems
+        creatively and build solutions that are not just functional, but
+        thoughtful and forward-thinking.
+      </p>
     </div>
     <div className="mb-4">
       <h3>
-        💰You know someone who could use my services? Refer them to me by
-        clicking the share button above and get a 30% commission on 1st payment.
+        In frontend development, I leverage psychological principles to design
+        user interfaces that are not only visually appealing but also
+        cognitively friendly. This approach results in products that resonate
+        more deeply with users, improving engagement and overall user
+        experience. By combining technical skills with insights from philosophy
+        and psychology, I strive to develop solutions that address both the
+        logical and emotional needs of users, creating more holistic and
+        impactful digital experiences.
       </h3>
     </div>
 
