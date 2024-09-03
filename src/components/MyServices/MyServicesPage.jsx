@@ -20,6 +20,9 @@ import researchImage from "../../assets/images/research.jpg";
 import swimmingImage from "../../assets/images/swimming.jpg";
 import teachingImage from "../../assets/images/teaching.jpg";
 import familyTimeImage from "../../assets/images/family-time.jpg";
+import blogging1 from "../../assets/images/blogging1.jpg";
+import blogging2 from "../../assets/images/blogging2.jpg";
+import blogging3 from "../../assets/images/blogging3.jpg";
 import myLogo from "../../assets/images/My-logo.jpg";
 
 const formatDescription = (text) => {
@@ -122,21 +125,31 @@ Unlike other local people who fix clients machines:
   ],
   interests: [
     {
-      id: "monsters",
-      title: "Monsters",
-      description: "In January of 2024, I'm creating my world.",
-      fullDescription: `In January of 2024, I'm creating my world(BruceMinangasWorld). In this world, I'm the god, shaping it with good intentions and positive actions. I'm conducting myself well in my world and taking care of the welfare of all beings within it.
+      id: "Blogging",
+      title: "Blogging, Stories & Mindset Education",
+      description: "Available on linkedin",
+      fullDescription: `Available on linkedin
+1. Saying techy words doesn't make us techy
+2. Understanding Computer Programming Languages (Part 1,2,3)
+3. Linux philosophy (Part 1,2)
+4. The game theory
 
-Unlike other gods:
--I'm encouraging my followers to create their worlds and be god like me. This helps them understand true nature of god and the benefits that come with it. (I'm not jealous, i co-operate).
--It's okey for people who can't handle being a god to worship a god of their choice or none (True Free Will).
 
--I'm open to collaboration with other gods to learn more from them because I'm not all-knowing.
+*My Stories include:*
+1. My tech journey
 
--If you are mature enough, you would easily understand the concept of Spiritual independence:(Developing one's own beliefs and values, rather than simply adopting those of family or society.)
+*Mindset Education*
+Mindset is like a way of thinking. It's what you believe about yourself and what you can do.
 
-It's who I am.`,
-      images: [monstersImage],
+Types of mindset
+1. Fixed mindset. It's when you believe you can't get better at something, no matter how hard you try
+2. Growth mindset. It's when you believe you can get better at something if you keep trying and practising. Those who cannot change their minds, cannot change anything
+
+Applying mindset principles
+1. At work. Encourage innovation & learning from mistakes 
+2. In relationship. Build stronger connections and resolve conflicts
+3. Health and wellness. Adopt and maintain healthy habits`,
+      images: [blogging1, blogging2, blogging3],
     },
     {
       id: "philosophy",
