@@ -33,6 +33,15 @@ const formatDescription = (text) => {
     );
 };
 
+const BlogLink = ({ href, children }) => (
+  <Link
+    to={href}
+    className="text-blue-600 hover:text-blue-800 hover:underline block mb-2"
+  >
+    {children}
+  </Link>
+);
+
 export const MyServicesItems = {
   professional: [
     {
@@ -128,27 +137,58 @@ Unlike other local people who fix clients machines:
       id: "Blogging",
       title: "Blogging, Stories & Mindset Education",
       description: "Available on linkedin",
-      fullDescription: `Available on linkedin
-1. Saying techy words doesn't make us techy
-2. Understanding Computer Programming Languages (Part 1,2,3)
-3. Linux philosophy (Part 1,2)
-4. The game theory
+      fullDescription: () => (
+        <>
+          <p>Available on linkedin</p>
+          <div className="mt-4 space-y-2">
+            <BlogLink href="https://www.linkedin.com/pulse/saying-techy-words-doesnt-make-us-bruce-minanga-zsj5f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D">
+              1. Saying techy words doesn't make us techy
+            </BlogLink>
+            <BlogLink href="https://www.linkedin.com/pulse/understanding-computer-programming-languages-bruce-minanga-sy47f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D">
+              2. Understanding Computer Programming Languages (Part 1,2,3)
+            </BlogLink>
+            <BlogLink href="https://www.linkedin.com/pulse/linux-philosophy-bruce-minanga-dqevf/">
+              3. Linux philosophy (Part 1,2)
+            </BlogLink>
+            <BlogLink href="https://www.linkedin.com/pulse/game-theory-bruce-minanga-73anf/">
+              4. The game theory
+            </BlogLink>
+          </div>
 
+          <h3 className="font-bold mt-4 mb-2">My Stories include:</h3>
+          <p>1. My tech journey</p>
 
-*My Stories include:*
-1. My tech journey
+          <h3 className="font-bold mt-4 mb-2">Mindset Education</h3>
+          <p>
+            Mindset is like a way of thinking. It's what you believe about
+            yourself and what you can do.
+          </p>
 
-*Mindset Education*
-Mindset is like a way of thinking. It's what you believe about yourself and what you can do.
+          <h4 className="font-semibold mt-3 mb-2">Types of mindset</h4>
+          <ol className="list-decimal list-inside">
+            <li>
+              Fixed mindset. It's when you believe you can't get better at
+              something, no matter how hard you try
+            </li>
+            <li>
+              Growth mindset. It's when you believe you can get better at
+              something if you keep trying and practising. Those who cannot
+              change their minds, cannot change anything
+            </li>
+          </ol>
 
-Types of mindset
-1. Fixed mindset. It's when you believe you can't get better at something, no matter how hard you try
-2. Growth mindset. It's when you believe you can get better at something if you keep trying and practising. Those who cannot change their minds, cannot change anything
-
-Applying mindset principles
-1. At work. Encourage innovation & learning from mistakes 
-2. In relationship. Build stronger connections and resolve conflicts
-3. Health and wellness. Adopt and maintain healthy habits`,
+          <h4 className="font-semibold mt-3 mb-2">
+            Applying mindset principles
+          </h4>
+          <ol className="list-decimal list-inside">
+            <li>At work. Encourage innovation & learning from mistakes</li>
+            <li>
+              In relationship. Build stronger connections and resolve conflicts
+            </li>
+            <li>Health and wellness. Adopt and maintain healthy habits</li>
+          </ol>
+        </>
+      ),
       images: [blogging1, blogging2, blogging3],
     },
     {
@@ -278,6 +318,26 @@ const ItemDetailView = () => {
     transition: "height 0.3s ease-out, opacity 0.3s ease-out",
   };
 
+  const renderDescription = () => {
+    if (typeof selectedItem.fullDescription === "function") {
+      return showFullDescription ? (
+        selectedItem.fullDescription()
+      ) : (
+        <p>{selectedItem.description}</p>
+      );
+    } else {
+      return (
+        <p className="text-gray-700 whitespace-pre-line">
+          {formatDescription(
+            showFullDescription
+              ? selectedItem.fullDescription
+              : selectedItem.description
+          )}
+        </p>
+      );
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col mx-auto mt-4">
       <div
@@ -295,23 +355,16 @@ const ItemDetailView = () => {
               {selectedItem.price}
             </p>
           )}
-          <div className="mb-4">
-            <p className="text-gray-700 whitespace-pre-line">
-              {formatDescription(
-                showFullDescription
-                  ? selectedItem.fullDescription
-                  : selectedItem.description
-              )}
-            </p>
-          </div>
-          {selectedItem.fullDescription && (
-            <button
-              className="text-blue-500 underline"
-              onClick={toggleDescription}
-            >
-              {showFullDescription ? "Read less" : "Read more"}
-            </button>
-          )}
+          <div className="mb-4">{renderDescription()}</div>
+          {selectedItem.fullDescription &&
+            selectedItem.fullDescription !== selectedItem.description && (
+              <button
+                className="text-blue-500 underline"
+                onClick={toggleDescription}
+              >
+                {showFullDescription ? "Read less" : "Read more"}
+              </button>
+            )}
           {selectedItem.referral && (
             <p className="text-sm text-blue-500 mt-2">
               {selectedItem.referral}
@@ -320,7 +373,7 @@ const ItemDetailView = () => {
         </div>
       </div>
       <div className="p-4 border-t">
-        <Link to="/">
+        <Link to="/MyServices">
           <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300">
             Back to Services
           </button>
