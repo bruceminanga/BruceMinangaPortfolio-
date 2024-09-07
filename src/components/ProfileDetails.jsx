@@ -46,11 +46,12 @@ const ProfileDetails = () => {
         <h3 className="font-bold text-lg mb-2">My Strategy</h3>
         <p>
           I blend technical expertise with a deep understanding of philosophical
-          concepts. This unique perspective allows me to approach all types of
-          problems creatively and build solutions that are not just functional,
-          but thoughtful and forward-thinking. With this strategy, i strongly
-          believe if something doesn't work as expected, then there is a proven
-          working concept missing or not applied correctly.
+          concepts(Which i use as formulas). This unique perspective allows me
+          to approach all types of problems creatively and build solutions that
+          are not just functional, but thoughtful and forward-thinking. With
+          this strategy, i strongly believe if something doesn't work as
+          expected, then there is a proven working concept missing or not
+          applied correctly.
         </p>
       </div>
 
