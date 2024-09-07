@@ -136,10 +136,10 @@ Unlike other local people who fix clients machines:
     {
       id: "Blogging",
       title: "Blogging, Stories & Mindset Education",
-      description: "Available on linkedin",
+      description: "Available on linkedin:",
       fullDescription: () => (
         <>
-          <p>Available on linkedin</p>
+          <p>Blogs available on linkedin</p>
           <div className="mt-4 space-y-2">
             <BlogLink href="https://www.linkedin.com/pulse/saying-techy-words-doesnt-make-us-bruce-minanga-zsj5f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D">
               1. Saying techy words doesn't make us techy
@@ -247,7 +247,7 @@ Subscribe to BruceMinangas.world to learn more of my research`,
   hobbies: [
     {
       id: "swimming",
-      title: "Swimming, Driving, Cycling & Flying",
+      title: "Swimming",
       description: "This is how I explore the world.",
       fullDescription: `This is how i explore the world with like minded individuals.
 
