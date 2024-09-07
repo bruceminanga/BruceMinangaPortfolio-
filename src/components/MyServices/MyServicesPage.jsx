@@ -247,7 +247,7 @@ Subscribe to BruceMinangas.world to learn more of my research`,
   hobbies: [
     {
       id: "swimming",
-      title: "Swimming, Adventure",
+      title: "Swimming & Adventure",
       description: "This is how I explore the world.",
       fullDescription: `This is how i explore the world with like minded individuals.
 
