@@ -14,7 +14,7 @@ const ProfileDetails = () => {
     Philosopher:
       "Passionate about exploring deep questions and applying philosophical concepts to problem-solving.",
     "Owner of BruceMinangas.world":
-      "A project where i share my systems. This systems include: Life framework system.",
+      "A project where i share my systems. These systems include: Life framework system.",
   };
 
   return (
@@ -49,9 +49,8 @@ const ProfileDetails = () => {
           concepts. This unique perspective allows me to approach all types of
           problems creatively and build solutions that are not just functional,
           but thoughtful and forward-thinking. With this strategy, i strongly
-          believe if something doesn't work as i expected, then there is a
-          proven working concept am missing or not getting right. I'm still open
-          to improve this strategy to help solve problems effectively.
+          believe if something doesn't work as expected, then there is a proven
+          working concept missing or not applied correctly.
         </p>
       </div>
 
