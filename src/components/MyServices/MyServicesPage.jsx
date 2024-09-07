@@ -247,11 +247,13 @@ Subscribe to BruceMinangas.world to learn more of my research`,
   hobbies: [
     {
       id: "swimming",
-      title: "Swimming",
+      title: "Swimming, Adventure",
       description: "This is how I explore the world.",
       fullDescription: `This is how i explore the world with like minded individuals.
 
-As a child, my parents gently bathed me in a warm basin. It was fun. As a grown-up, I upgraded to a heated swimming pool. It's fun.`,
+As a child, my parents gently bathed me in a warm basin. It was fun. As a grown-up, I upgraded to a heated swimming pool. It's fun. 
+
+I also love to explore the world to understand how everything within it was made.`,
       images: [swimmingImage],
     },
     {
