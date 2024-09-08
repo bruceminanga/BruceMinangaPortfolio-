@@ -69,7 +69,7 @@ const ProfileDetails = () => {
       </div>
 
       <div className="mt-6">
-        <h3 className="font-bold text-lg mb-2">Mission, vission & motto</h3>
+        <h3 className="font-bold text-lg mb-2">My mission, vission & motto</h3>
         <p className="mb-2">
           🌟使命🌟Make the world a better place🌟想象🌟A model person who
           provides quality services🌟座右铭🌟 Knowing & understanding my
