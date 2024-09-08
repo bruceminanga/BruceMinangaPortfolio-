@@ -29,7 +29,7 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="min-h-screen bg-blue-100 flex flex-col">
         <main className="flex-grow py-8">
           <div className="max-w-md mx-auto space-y-4">
             <Suspense fallback={<TechLoading />}>
