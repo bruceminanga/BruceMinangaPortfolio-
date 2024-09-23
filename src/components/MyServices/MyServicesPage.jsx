@@ -131,6 +131,17 @@ Unlike other local people who fix clients machines:
 -I explain honestly whats wrong with clients machine and fix them permanently which in the long term saves clients money.`,
       images: [softwareEngineeringImage],
     },
+    {
+      id: "Photos-professionale",
+      title: "Photos Professionale",
+      description:
+        "In September of 2023, I started to design logos for personal and business use. Logo can be used on business cards, websites, social media profiles, and other marketing materials.",
+      fullDescription:
+        "In September of 2023, I started to design logos for personal and business use. Logo can be used on business cards, websites, social media profiles, and other marketing materials. They are important because they help in brand recognition, shows professionalism, consistency and emotional support.",
+      price: "KES 1,500.00",
+      images: [logoMakerImage],
+      referral: "Refer clients to me and get ksh500 per client after payment.",
+    },
   ],
   interests: [
     {

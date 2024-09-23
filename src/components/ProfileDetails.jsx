@@ -45,26 +45,32 @@ const ProfileDetails = () => {
       <div className="mb-4 mt-8">
         <h3 className="font-bold text-lg mb-2">My Strategy</h3>
         <p>
-          I blend technical expertise with a deep understanding of philosophical
-          concepts(Which i use as formulas). This unique perspective allows me
-          to approach all types of problems creatively and build solutions that
-          are not just functional, but thoughtful and forward-thinking. With
-          this strategy, i strongly believe if something doesn't work as
-          expected, then there is a proven working concept missing or not
-          applied correctly.
+          I integrate philosophical concepts with technical knowlege to craft
+          solutions that are not just functional, but thoughtful and
+          forward-thinking. This approach allows me to:{" "}
+        </p>
+        <p>
+          1. Design user interfaces that are both visually appealing and
+          cognitively friendly, applying psychological principles to frontend
+          development.{" "}
+        </p>{" "}
+        <p>
+          2. Utilize game theory concepts to optimize decision-making processes.{" "}
+        </p>
+        <p>
+          3. Tackle tech problems from multiple angles, combining my IT skills
+          with insights from philosophy to find creative solutions.
         </p>
       </div>
 
       <div className="mb-4">
-        <h3 className="font-bold text-lg mb-2">How i apply my strategy</h3>
+        <h3 className="font-bold text-lg mb-2">My Philosophy</h3>
         <p>
-          1. In frontend web development, I use psychological principles to
-          design user interfaces that are not only visually appealing but also
-          cognitively friendly.
-        </p>
-        <p>
-          2. Another philosophical concept i use alot is the game theory, a
-          concept used in almost all industries.
+          If something doesn't work for me as expected, there's likely a proven
+          concept I'm missing or not fully grasping. However, if a concept for
+          solving a particular problem doesn't exist, I strive to create one on
+          my own. I'm always eager to refine this strategy and learn new
+          approaches to problem-solving.
         </p>
       </div>
 
