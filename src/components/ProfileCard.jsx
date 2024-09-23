@@ -160,9 +160,8 @@ const ProfileCard = () => {
       <div className="pt-16 pb-8 px-6 text-center">
         <h2 className="text-2xl font-bold text-gray-800">Bruce Minanga</h2>
         <p className="text-sm text-gray-600 mt-2">
-          Philosopher • Psychologist • Linux SysAdmin(DevOps Engineer) • Web &
-          Android Developer • Open Source & Data Science Enthusiast •
-          Entrepreneur • Blogger
+          Philosopher • Linux SysAdmin(DevOps Engineer) • Web Developer • Open
+          Source Enthusiast • Entrepreneur • Blogger
         </p>
         <p
           className={`text-sm mt-2 ${
