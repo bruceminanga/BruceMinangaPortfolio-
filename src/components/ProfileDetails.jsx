@@ -55,11 +55,8 @@ const ProfileDetails = () => {
           development.{" "}
         </p>{" "}
         <p>
-          2. Utilize game theory concepts to optimize decision-making processes.{" "}
-        </p>
-        <p>
-          3. Tackle tech problems from multiple angles, combining my IT skills
-          with insights from philosophy to find creative solutions.
+          2. Tackle tech problems from multiple angles, combining my IT skills
+          with concepts from philosophy to find creative solutions.{" "}
         </p>
       </div>
 
