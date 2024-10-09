@@ -45,14 +45,13 @@ const ProfileDetails = () => {
       <div className="mb-4 mt-8">
         <h3 className="font-bold text-lg mb-2">My Strategy</h3>
         <p>
-          I integrate philosophical concepts with technical knowlege to craft
-          solutions that are not just functional, but thoughtful and
-          forward-thinking. This approach allows me to:{" "}
+          I integrate concepts with technical knowlege to craft solutions that
+          are not just functional, but thoughtful and forward-thinking. This
+          approach allows me to:{" "}
         </p>
         <p>
           1. Design user interfaces that are both visually appealing and
-          cognitively friendly, applying psychological principles to frontend
-          development.{" "}
+          cognitively friendly.
         </p>{" "}
         <p>
           2. Tackle tech problems from multiple angles, combining my IT skills
