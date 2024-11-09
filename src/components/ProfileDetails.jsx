@@ -45,18 +45,23 @@ const ProfileDetails = () => {
       <div className="mb-4 mt-8">
         <h3 className="font-bold text-lg mb-2">My Strategy</h3>
         <p>
-          I integrate concepts with technical knowlege to craft solutions that
-          are not just functional, but thoughtful and forward-thinking. This
-          approach allows me to:{" "}
+          When learning or implementing DevOps practices and web development
+          technologies, I focus on understanding the core principles/concepts
+          and patterns - like why we need continuous integration, what problems
+          containerization solves, or why certain architectural patterns exist -
+          rather than memorizing specific Docker commands or Kubernetes
+          configurations. These tools and their syntax constantly evolve, but
+          the fundamental problems they solve and patterns they implement remain
+          relatively stable. For example, instead of just learning how to write
+          GitHub Actions YAML files, I first focus on understanding:{" "}
         </p>
-        <p>
-          1. Design user interfaces that are both visually appealing and
-          cognitively friendly.
-        </p>{" "}
-        <p>
-          2. Tackle tech problems from multiple angles, combining my IT skills
-          with concepts from philosophy to find creative solutions.{" "}
-        </p>
+        <p>1. Why we need automated pipelines</p>{" "}
+        <p>2. What makes a good deployment strategy </p>
+        <p>3. How to structure services for maintainability </p>
+        <p>4. When to choose certain architectural patterns </p>
+        This way, when tools change or new ones emerge, I can quickly adapt
+        because I understand the underlying principles/concepts they're built
+        on.
       </div>
 
       <div className="mb-4">
@@ -74,8 +79,8 @@ const ProfileDetails = () => {
         <h3 className="font-bold text-lg mb-2">My mission, vission & motto</h3>
         <p className="mb-2">
           🌟使命🌟Make the world a better place🌟想象🌟A model person who
-          provides quality services🌟座右铭🌟 Knowing & understanding my
-          job+Moving On+Spread Joy.
+          provides quality services🌟座右铭🌟 Applying knowledge(Concepts) to
+          solve problems+Moving On+Spread Joy.
         </p>
         <h3 className="font-bold text-lg mb-2" style={{ color: "#005675" }}>
           Spy on me via <MovingEyes />:
