@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-import myLogo from "../assets/images/My-logo.jpg";
+import myLogo from "../assets/images/My-logo.png";
 import backgroundVideo from "../assets/videos/fire.mp4";
 
 const ProfileCard = () => {

@@ -23,7 +23,7 @@ import familyTimeImage from "../../assets/images/family-time.jpg";
 import blogging1 from "../../assets/images/blogging1.jpg";
 import blogging2 from "../../assets/images/blogging2.jpg";
 import blogging3 from "../../assets/images/blogging3.jpg";
-import myLogo from "../../assets/images/My-logo.jpg";
+import myLogo from "../../assets/images/My-logo.png";
 
 const formatDescription = (text) => {
   return text
