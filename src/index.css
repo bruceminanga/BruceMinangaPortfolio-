@@ -2,12 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure base html/body have appropriate background for edge cases */
+body {
+  background-color: #f0f9ff; /* Match the lightest gradient color */
+  color: #374151; /* Default text color */
+}
 
+/* Footer Marquee Styles (Keep as is) */
 footer#main-footer {
   color: #005675;
-  font-size: 16px;
+  font-size: 14px; /* Slightly smaller footer text */
   padding: 1rem 0;
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa; */ /* Replaced by transparent background below */
 }
 
 .marquee-container {
@@ -27,7 +33,7 @@ footer#main-footer {
 }
 
 .quotes span {
-  padding-right: 80px;
+  padding-right: 80px; /* Spacing between quotes */
 }
 
 @keyframes marquee {
@@ -39,3 +45,213 @@ footer#main-footer {
   }
 }
 
+
+/* --- Animated Background Styles --- */
+.animated-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* Behind content */
+  overflow: hidden;
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+.gradient-bg {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(119, 160, 255, 0.15) 0%, rgba(59, 130, 246, 0) 30%),
+    radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0) 30%),
+    radial-gradient(circle at 30% 70%, rgba(236, 72, 153, 0.1) 0%, rgba(236, 72, 153, 0) 30%),
+    radial-gradient(circle at 90% 80%, rgba(20, 184, 166, 0.1) 0%, rgba(20, 184, 166, 0) 30%),
+    linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #dbeafe 50%, #ede9fe 75%, #fae8ff 100%);
+  transform-origin: center;
+  animation: gradientShift 20s ease-in-out infinite alternate;
+}
+
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(59, 130, 246, 0.2); /* Reduced opacity */
+  filter: blur(1px);
+  animation: float 20s ease-in-out infinite alternate;
+}
+.floating-particle:nth-child(even) { background-color: rgba(139, 92, 246, 0.2); }
+.floating-particle:nth-child(3n) { background-color: rgba(236, 72, 153, 0.2); }
+.floating-particle:nth-child(4n) { background-color: rgba(20, 184, 166, 0.2); }
+
+/* --- UPDATED Floating Concept Base Styles --- */
+.floating-concept {
+  position: absolute;
+  font-size: 6rem; /* Base size, adjusted in media queries */
+  font-weight: 800;
+  opacity: 0.2; /* Default visibility - ADJUST AS NEEDED (e.g., 0.15, 0.25) */
+  transform-origin: center;
+  animation: floatText 30s ease-in-out infinite alternate;
+  white-space: nowrap;
+  user-select: none;
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); /* Smooth transitions for opacity, transform, etc. */
+  /* Subtle base text shadow to help separate from background */
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+/* --- UPDATED Active Concept Styles --- */
+.active-concept {
+  /* No floating animation when active */
+  animation: none !important;
+  /* Use text-shadow for glow effect - looks cleaner than filter: drop-shadow */
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.9), 0 0 15px rgba(255, 255, 255, 0.7);
+  /* Add pulsing animation to the glow */
+  animation: pulseGlow 2.5s infinite ease-in-out !important;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeInOut 2s ease-in-out infinite;
+  z-index: 1; /* Ensure it's above particles/gradient */
+}
+.scroll-icon {
+  width: 24px;
+  height: 40px;
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  border-radius: 12px;
+  position: relative;
+  margin-bottom: 5px;
+}
+.scroll-wheel {
+  width: 6px;
+  height: 6px;
+  background-color: rgba(59, 130, 246, 0.8);
+  border-radius: 50%;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollWheel 2s ease-in-out infinite;
+}
+.scroll-text {
+  font-size: 12px;
+  color: rgba(59, 130, 246, 0.8);
+  font-weight: 500;
+}
+
+
+/* --- UPDATED Main Content Container Style --- */
+.max-w-md {
+  /* Semi-transparent background */
+  /* ADJUST alpha (0.65) for more/less transparency */
+  background: rgba(255, 255, 255, 0.65);
+
+  /* Frosted glass effect */
+  /* ADJUST blur amount (8px) */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* Safari support */
+
+  /* Subtle border to define edges */
+  /* ADJUST color/opacity (0.4) */
+  border: 1px solid rgba(219, 234, 254, 0.4);
+
+  border-radius: 1rem; /* Keep rounded corners */
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+  overflow: hidden; /* Important to contain the blur */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border 0.3s ease;
+
+  /* Add padding INSIDE the container */
+  padding: 1.5rem; /* ADJUST as needed */
+}
+
+.max-w-md:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.15), 0 10px 10px -5px rgba(59, 130, 246, 0.1);
+  /* Optional: Slightly change background/border on hover */
+  /* background: rgba(255, 255, 255, 0.7); */
+  /* border: 1px solid rgba(219, 234, 254, 0.6); */
+}
+
+/* --- UPDATED Footer Style --- */
+#main-footer {
+  position: relative; /* Keep relative for stacking */
+  z-index: 10; /* Ensure above background */
+  /* Apply similar transparency/blur */
+  background: rgba(248, 249, 250, 0.7); /* Original color with alpha - ADJUST */
+  backdrop-filter: blur(8px); /* ADJUST */
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(219, 234, 254, 0.5); /* Subtle top border */
+  /* Keep other specific footer styles */
+  color: #005675;
+  font-size: 14px;
+  padding: 1rem 0;
+  margin-top: auto; /* Pushes footer to bottom if content is short */
+}
+
+/* Keyframe Animations (Keep as is or adjust timings) */
+@keyframes gradientShift {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(5deg) scale(1.05); }
+}
+@keyframes float {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(10px, 15px); }
+  100% { transform: translate(-10px, -15px); }
+}
+@keyframes floatText {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(20px, 15px) rotate(2deg); }
+  100% { transform: translate(-20px, -15px) rotate(-2deg); }
+}
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+@keyframes scrollWheel {
+  0% { top: 8px; opacity: 1; }
+  50% { top: 25px; opacity: 0; }
+  51% { top: 8px; opacity: 0; }
+  100% { top: 8px; opacity: 1; }
+}
+
+/* --- UPDATED Pulse Glow using text-shadow --- */
+@keyframes pulseGlow {
+  0%, 100% { text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 8px rgba(255, 255, 255, 0.5); }
+  50% { text-shadow: 0 0 40px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .floating-concept {
+    font-size: 4rem; /* Smaller text on tablets */
+  }
+  .max-w-md {
+    padding: 1.25rem; /* Adjust padding */
+  }
+}
+
+@media (max-width: 640px) {
+  .floating-concept {
+    font-size: 3rem; /* Smaller text on phones */
+  }
+  .max-w-md {
+    padding: 1rem; /* Adjust padding */
+    margin-left: 1rem; /* Add some horizontal margin on small screens */
+    margin-right: 1rem;
+    max-width: calc(100% - 2rem); /* Ensure it doesn't touch edges */
+  }
+  main {
+    padding-top: 4rem; /* Less padding on main for small screens */
+    padding-bottom: 4rem;
+  }
+  #main-footer {
+    font-size: 12px; /* Smaller footer text */
+  }
+}

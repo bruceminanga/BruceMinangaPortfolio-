@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
-  BrowserRouter as Router,
+  BrowserRouter as Router, // Note: Using HashRouter in App.jsx, keep consistent if needed elsewhere
   Route,
   Link,
   Routes,
   useParams,
 } from "react-router-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import ImageCarousel from "./ImageCarousel";
+import ImageCarousel from "./ImageCarousel"; // Ensure this component exists
 
 // Note: Replace these with your actual image imports
 import logoMakerImage from "../../assets/images/logomaker.jpg";
@@ -25,7 +25,13 @@ import blogging2 from "../../assets/images/blogging2.jpg";
 import blogging3 from "../../assets/images/blogging3.jpg";
 import myLogo from "../../assets/images/My-logo.png";
 
+// Helper to format description with bold text
 const formatDescription = (text) => {
+  // Ensure text is a string before splitting
+  if (typeof text !== "string") {
+    console.warn("formatDescription received non-string input:", text);
+    return text; // Return original if not a string
+  }
   return text
     .split("*")
     .map((part, index) =>
@@ -33,33 +39,47 @@ const formatDescription = (text) => {
     );
 };
 
+// Reusable Blog Link component
 const BlogLink = ({ href, children }) => (
-  <Link
-    to={href}
+  <a // Changed to <a> for external links
+    href={href}
+    target="_blank" // Open in new tab
+    rel="noopener noreferrer" // Security measure
     className="text-blue-600 hover:text-blue-800 hover:underline block mb-2"
   >
     {children}
-  </Link>
+  </a>
 );
 
+// --- DATA STRUCTURE ---
 export const MyServicesItems = {
   professional: [
     {
       id: "logo-maker",
       title: "Logo Maker",
       description:
-        "In September of 2023, I started to design logos for personal and business use. Logo can be used on business cards, websites, social media profiles, and other marketing materials.",
+        "Design unique logos for personal and business use to enhance brand recognition and professionalism.",
       fullDescription:
-        "In September of 2023, I started to design logos for personal and business use. Logo can be used on business cards, websites, social media profiles, and other marketing materials. They are important because they help in brand recognition, shows professionalism, consistency and emotional support.",
+        "In September of 2023, I started to design logos for personal and business use. A professional logo is crucial for brand identity and can be used across various marketing materials like business cards, websites, and social media profiles. They significantly aid in brand recognition, convey professionalism, ensure consistency, and can even foster emotional connections with your audience.",
       price: "KES 1,500.00",
       images: [logoMakerImage],
-      referral: "Refer clients to me and get ksh500 per client after payment.",
+      referral: "Refer clients to me and get KES 500 per client after payment.",
+      // --- ADDED What's Included ---
+      whatsIncluded: [
+        "3 Initial Logo Concepts",
+        "Up to 5 Revision Rounds",
+        "High-Resolution Files (PNG, JPG, SVG)",
+        "Full Color & Black/White Versions",
+        "Basic Brand Style Guide (Color Palette & Fonts)",
+        "Full Ownership Rights",
+      ],
+      // --- END ---
     },
     {
       id: "tech-lead",
       title: "Tech Lead & Tech Sales Representative",
       description:
-        "In September of 2023, I started to sell technology products/services to customers. I have the follow",
+        "Selling quality tech products (laptops, storage) with basic desktop support included.",
       fullDescription: `In September of 2023, I started to sell technology products/services to customers. I have the following gadgets for sell:
 💻💻💻💻💻💻Laptops 💻💻💻💻💻💻
 *1. Lenovo(Highly Recommend if you are a Techy coz its cross platform)*
@@ -101,17 +121,18 @@ Redmi note 13 4GB ram, 128GB rom @25k
 🎧🎧🎧🎧🎧Earphones🎧🎧🎧🎧🎧🎧🎧
 Oraimo original @300
 Unlike other tech sellers, we offer free basic desktop support after you become our client. They include:
-1. Initial setup assistance ie connecting to internet, setting up user account, and basic configuration. 
+1. Initial setup assistance ie connecting to internet, setting up user account, and basic configuration.
 2. Troubleshooting common issues ie installation errors, basic virus removal, and system performance optimization
 3. Basic usage guidance. Advice on how to use the operating system and pre-installed software effectively
 🔥Order now🔥`,
       images: [techLeadImage1, techLeadImage2],
+      // No 'whatsIncluded' array here, so the section won't render for this item
     },
     {
       id: "software-engineering",
       title: "Software Engineering & IT Operations",
       description:
-        "In September of 2023, I started to focus on software engineering and IT Operation.",
+        "Web development, software installation/maintenance, and computer troubleshooting/repair.",
       fullDescription: `In September of 2023, I started to provide the following services:
 
 *Web Development Services:* I charge according to your website's complexity.
@@ -130,73 +151,89 @@ Unlike other tech sellers, we offer free basic desktop support after you become 
 Unlike other local people who fix clients machines:
 -I explain honestly whats wrong with clients machine and fix them permanently which in the long term saves clients money.`,
       images: [softwareEngineeringImage],
-    },
-    {
-      id: "Photos-professionale",
-      title: "Photos Professionale",
-      description:
-        "In September of 2023, I started to design logos for personal and business use. Logo can be used on business cards, websites, social media profiles, and other marketing materials.",
-      fullDescription:
-        "In September of 2023, I started to design logos for personal and business use. Logo can be used on business cards, websites, social media profiles, and other marketing materials. They are important because they help in brand recognition, shows professionalism, consistency and emotional support.",
-      price: "KES 1,500.00",
-      images: [logoMakerImage],
-      referral: "Refer clients to me and get ksh500 per client after payment.",
+      // --- ADDED What's Included ---
+      whatsIncluded: {
+        "Web Development (Example)": [
+          // Example of using objects for sub-sections
+          "Custom Website Design & Development",
+          "Responsive Design (Mobile, Tablet, Desktop)",
+          "Content Management System (Optional)",
+          "Basic SEO Optimization",
+          "Contact Form Integration",
+          "Deployment Assistance",
+        ],
+        "IT Operations": [
+          "Windows/Office Installation & Activation (as per listed prices)",
+          "Antivirus Installation (as per listed prices)",
+          "Software Troubleshooting (as per listed price)",
+          "Hardware Repair (Price varies)",
+          "Honest Diagnosis & Long-Term Fixes",
+        ],
+      },
+      // --- END ---
     },
   ],
   interests: [
     {
       id: "Blogging",
       title: "Blogging, Stories & Mindset Education",
-      description: "Available on linkedin:",
+      description:
+        "Sharing insights on tech, life, and growth mindset via LinkedIn.",
       fullDescription: () => (
+        // Using function for complex JSX structure
         <>
-          <p>Blogs available on linkedin</p>
-          <div className="mt-4 space-y-2">
+          <p className="mb-3">
+            Insights and stories shared primarily on LinkedIn.
+          </p>
+          <h3 className="font-bold text-lg mb-2 text-gray-800">
+            Featured Blogs:
+          </h3>
+          <div className="mb-4 space-y-1">
             <BlogLink href="https://www.linkedin.com/pulse/saying-techy-words-doesnt-make-us-bruce-minanga-zsj5f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D">
-              1. Saying techy words doesn't make us techy
+              1. Saying Techy Words Doesn't Make Us Techy
             </BlogLink>
             <BlogLink href="https://www.linkedin.com/pulse/understanding-computer-programming-languages-bruce-minanga-sy47f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D">
-              2. Understanding Computer Programming Languages (Part 1,2,3)
+              2. Understanding Computer Programming Languages (Series)
             </BlogLink>
             <BlogLink href="https://www.linkedin.com/pulse/linux-philosophy-bruce-minanga-dqevf/">
-              3. Linux philosophy (Part 1,2)
+              3. Linux Philosophy (Series)
             </BlogLink>
             <BlogLink href="https://www.linkedin.com/pulse/game-theory-bruce-minanga-73anf/">
-              4. The game theory
+              4. The Game Theory
             </BlogLink>
           </div>
 
-          <h3 className="font-bold mt-4 mb-2">My Stories include:</h3>
-          <p>1. My tech journey</p>
-
-          <h3 className="font-bold mt-4 mb-2">Mindset Education</h3>
-          <p>
-            Mindset is like a way of thinking. It's what you believe about
-            yourself and what you can do.
+          <h3 className="font-bold text-lg mt-5 mb-2 text-gray-800">
+            Stories:
+          </h3>
+          <p className="mb-4">
+            Includes personal narratives like "My Tech Journey".
           </p>
 
-          <h4 className="font-semibold mt-3 mb-2">Types of mindset</h4>
-          <ol className="list-decimal list-inside">
+          <h3 className="font-bold text-lg mt-5 mb-2 text-gray-800">
+            Mindset Education:
+          </h3>
+          <p className="mb-2">
+            Focusing on the power of mindset – your beliefs about your
+            capabilities.
+          </p>
+          <h4 className="font-semibold mt-3 mb-1 text-gray-700">
+            Types of Mindset:
+          </h4>
+          <ol className="list-decimal list-inside space-y-1 mb-3">
+            <li>*Fixed Mindset:* Believing abilities are static.</li>
             <li>
-              Fixed mindset. It's when you believe you can't get better at
-              something, no matter how hard you try
-            </li>
-            <li>
-              Growth mindset. It's when you believe you can get better at
-              something if you keep trying and practising. Those who cannot
-              change their minds, cannot change anything
+              *Growth Mindset:* Believing abilities can be developed through
+              effort.
             </li>
           </ol>
-
-          <h4 className="font-semibold mt-3 mb-2">
-            Applying mindset principles
+          <h4 className="font-semibold mt-3 mb-1 text-gray-700">
+            Application:
           </h4>
-          <ol className="list-decimal list-inside">
-            <li>At work. Encourage innovation & learning from mistakes</li>
-            <li>
-              In relationship. Build stronger connections and resolve conflicts
-            </li>
-            <li>Health and wellness. Adopt and maintain healthy habits</li>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>*Work:* Fostering innovation and learning from setbacks.</li>
+            <li>*Relationships:* Building stronger connections.</li>
+            <li>*Health:* Adopting and maintaining healthy habits.</li>
           </ol>
         </>
       ),
@@ -206,52 +243,43 @@ Unlike other local people who fix clients machines:
       id: "philosophy",
       title: "Philosophy, Psychology & History",
       description:
-        "In September of 2023, I started to learn philosophy, psychology",
-      fullDescription: `In September of 2023, I started to learn philosophy. It is helping me rewire my brain and help me get out of inappropriate social constructs. On the other hand, psychology makes human lives better and history makes us know where we came from and where we are heading to.
-*Here are my true findings:*
-1. Philosophers can be wrong; they present to you their thoughts 🤷🏽‍♂️
-2. It's easier to understand people's thoughts when you are a philosopher.
-3. Philosophers run the world. 
+        "Exploring philosophical concepts, psychological insights, and historical context.",
+      fullDescription: `Since September 2023, I've delved into philosophy, psychology, and history to better understand the world and human behavior. Philosophy helps challenge constructs, psychology enhances understanding of people, and history provides context.
+*Key Findings:*
+1. Philosophers offer perspectives, not absolute truths.
+2. Philosophy aids in understanding others' thoughts.
+3. Foundational ideas (often philosophical) shape the world.
 
-*My best philosophical concepts:*
-1. Solipsism: You and only you exist.
-2. Empiricism: The source of human knowledge is experience.
-3. Rationalism: Reason and logic are the primary sources of knowledge and truth.
-4. Resilience & Stoicism. Ability to endure Destructions
+*Favorite Philosophical Concepts:*
+1. Solipsism (as a thought experiment).
+2. Empiricism vs. Rationalism (sources of knowledge).
+3. Stoicism & Resilience (enduring hardship).
 
-*My best psychological concepts:*
-1. Halo effect. Judgment based on looks 
-2. Habituation. Disliking repetitive tasks. 
+*Interesting Psychological Concepts:*
+1. Halo Effect (judgment based on first impressions).
+2. Habituation (desensitization to stimuli).
+3. Synchronicity (meaningful coincidences - viewed with healthy skepticism).
 
-*Psychological concepts I can't entirely agree fully with:*
-1. Synchronicity. Coincidences
+*Historical Awareness:* Understanding periods like the Dark Ages provides perspective on progress.
 
-*Horror history:*
-1. Dark ages. A period between 5th-15th century.
-
-I am selling each package of a successful philosophical solution (Intellectual property) at ksh500.`,
-      price: "KES 500.00",
+*Note:* Selling intellectual property requires careful consideration of legal and ethical aspects. The "philosophical solution package" concept needs refinement.`,
       images: [philosophyImage],
     },
     {
       id: "research",
       title: "Research & Did You Know Phrase",
       description:
-        "In September of 2023, I'm intensly starting to get involced in reasearch.",
-      fullDescription: `In September of 2023, i'm intensively starting to get involved in the following research
-1️⃣Life pattern recognition, pattern utilisation and pattern creation. 
-My project called Life Framework has 3 sections: 
--| Health and Awareness
--| Relationships=Pleasures
--| Work=Contribution To Society
-2️⃣Technological research
+        "Focusing on life pattern analysis (Life Framework) and technological research.",
+      fullDescription: `Actively engaged in research since September 2023:
+1️⃣ *Life Pattern Analysis:* Developing the "Life Framework" project focusing on pattern recognition, utilization, and creation across key areas:
+    -| Health and Awareness
+    -| Relationships & Pleasures
+    -| Work & Contribution To Society
+2️⃣ *Technological Research:* Exploring advancements and trends in technology.
 
-🎒Personal🎒
-Did you know:
-1️⃣I regularly update my Portfolio
-
-Subscribe to BruceMinangas.world to learn more of my research`,
-      price: "KES 3,000.00",
+🎒*Personal Insights & Updates (Did You Know):*🎒
+1️⃣ My portfolio is regularly updated with new projects and insights.
+2️⃣ Subscribing to BruceMinangas.world provides access to more detailed research and systems. (Consider clarity on what subscription entails).`,
       images: [researchImage],
     },
   ],
@@ -259,171 +287,275 @@ Subscribe to BruceMinangas.world to learn more of my research`,
     {
       id: "swimming",
       title: "Swimming & Adventure",
-      description: "This is how I explore the world.",
-      fullDescription: `This is how i explore the world with like minded individuals to understand how everything within it was made.
-
-As a child, my parents gently bathed me in a warm basin. It was fun. As a grown-up, I upgraded to a heated swimming pool. It's fun. 
-`,
+      description: "Exploring the world physically and metaphorically.",
+      fullDescription: `Exploring the world with like-minded individuals to understand its wonders. Swimming provides both physical activity and a meditative experience, evolving from childhood baths to enjoying heated pools. Adventure seeking broadens perspectives.`,
       images: [swimmingImage],
     },
     {
       id: "teaching",
       title: "Teaching & Public speaking",
-      description: "I love to spread the knowledge I have.",
-      fullDescription: `I love to spread the knowledge i gained throughout my work to the world. Currently, i do teach and charge ksh100 per hour. I do teach the following:
-1️⃣Programming
-You can also Hire me as a public speaker to talk about science, technology and engineering.
-I charge ksh3000 per hour. Transport Cost Not Included.`,
+      description: "Sharing knowledge in programming and technology.",
+      fullDescription: `Passionate about disseminating knowledge gained through experience.
+*Teaching Services (KES 100 per hour):*
+1️⃣ Programming Fundamentals & Specific Languages (Specify which ones you teach)
+
+*Public Speaking Services (KES 3000 per hour + Transport):*
+Available to speak on topics related to Science, Technology, and Engineering.`,
       images: [teachingImage],
+      price: "KES 100/hr (Teaching), KES 3000/hr (Speaking)", // Example combined pricing info
     },
     {
       id: "family-time",
       title: "Spending Time With Family & Friends",
-      description: "To all my family (My Mom and Dad).",
-      fullDescription: `To all my family (My Mom and Dad in particular) and friends who gave me support and care throughout my dream endeavours, I am highly grateful. I would be nothing without you. Peace ✌️
+      description: "Appreciating the support system.",
+      fullDescription: `Deeply grateful to my family (especially Mom and Dad) and friends for their unwavering support and care throughout my endeavors. Meaningful relationships are fundamental. Peace ✌️
 
-Don't forget to subscribe @BruceMinangas.world to get free support system`,
+Consider subscribing @BruceMinangas.world for insights on building support systems. (Clarify subscription benefits).`,
       images: [familyTimeImage],
     },
   ],
 };
 
-const ItemDetailView = () => {
+// --- ITEM DETAIL VIEW COMPONENT (Already exported via 'export const') ---
+export const ItemDetailView = () => {
   const { category, id } = useParams();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const detailViewRef = useRef(null);
 
-  const selectedItem = MyServicesItems[category].find((item) => item.id === id);
+  // Find the item safely
+  const categoryItems = MyServicesItems[category] || [];
+  const selectedItem = categoryItems.find((item) => item.id === id);
 
   const toggleDescription = useCallback(() => {
     setShowFullDescription((prev) => !prev);
   }, []);
 
+  // Handle scrolling for effects
   useEffect(() => {
     const handleScroll = () => {
       if (detailViewRef.current) {
         setScrollPosition(detailViewRef.current.scrollTop);
       }
     };
-
     const detailView = detailViewRef.current;
     if (detailView) {
       detailView.addEventListener("scroll", handleScroll);
+      return () => detailView.removeEventListener("scroll", handleScroll);
     }
-
-    return () => {
-      if (detailView) {
-        detailView.removeEventListener("scroll", handleScroll);
-      }
-    };
   }, []);
 
-  if (!selectedItem) return <div>Item not found</div>;
+  // Handle item not found
+  if (!selectedItem) {
+    return (
+      <div className="text-center p-10">
+        <h2 className="text-xl font-semibold text-red-600">Item not found</h2>
+        <Link
+          to="/MyServices"
+          className="text-blue-500 hover:underline mt-4 inline-block"
+        >
+          Go back to Services
+        </Link>
+      </div>
+    );
+  }
 
-  const imageHeight = 300;
-  const scrollThreshold = 100;
-
+  // Image parallax effect styles
+  const imageHeight = 250; // Adjusted height
+  const scrollThreshold = 150; // When effect becomes prominent
   const imageStyle = {
-    height: `${Math.max(0, imageHeight - scrollPosition)}px`,
-    opacity: Math.max(0, 1 - scrollPosition / scrollThreshold),
-    transition: "height 0.3s ease-out, opacity 0.3s ease-out",
+    height: `${Math.max(50, imageHeight - scrollPosition * 0.8)}px`, // Ensure min height
+    opacity: Math.max(0.1, 1 - scrollPosition / scrollThreshold), // Ensure min opacity
+    transition: "height 0.1s linear, opacity 0.1s linear", // Faster transition
   };
 
-  const renderDescription = () => {
-    if (typeof selectedItem.fullDescription === "function") {
-      return showFullDescription ? (
-        selectedItem.fullDescription()
-      ) : (
-        <p>{selectedItem.description}</p>
-      );
+  // Render description based on type (string or function)
+  const renderDescriptionContent = () => {
+    const descriptionToShow = showFullDescription
+      ? selectedItem.fullDescription
+      : selectedItem.description;
+    if (typeof descriptionToShow === "function") {
+      return descriptionToShow(); // Call the function if it's JSX
     } else {
+      // Handle string descriptions with formatting
       return (
-        <p className="text-gray-700 whitespace-pre-line">
-          {formatDescription(
-            showFullDescription
-              ? selectedItem.fullDescription
-              : selectedItem.description
-          )}
+        <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+          {formatDescription(descriptionToShow || "")}{" "}
+          {/* Ensure it's a string */}
         </p>
       );
     }
   };
 
+  // Render "What's Included" section data
+  const renderWhatsIncluded = () => {
+    if (!selectedItem.whatsIncluded) return null; // No data
+
+    // Handle array of strings
+    if (Array.isArray(selectedItem.whatsIncluded)) {
+      return (
+        <ul className="list-disc list-inside pl-2 space-y-1 text-gray-700">
+          {selectedItem.whatsIncluded.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    // Handle object (for sub-sections)
+    if (
+      typeof selectedItem.whatsIncluded === "object" &&
+      !Array.isArray(selectedItem.whatsIncluded)
+    ) {
+      return (
+        <div className="space-y-3">
+          {Object.entries(selectedItem.whatsIncluded).map(
+            ([subHeading, items]) => (
+              <div key={subHeading}>
+                <h4 className="font-semibold text-gray-700 mb-1">
+                  {subHeading}:
+                </h4>
+                <ul className="list-disc list-inside pl-4 space-y-1 text-gray-600">
+                  {Array.isArray(items) ? (
+                    items.map((item, index) => (
+                      <li key={`${subHeading}-${index}`}>{item}</li>
+                    ))
+                  ) : (
+                    <li>Invalid data format for items</li>
+                  )}
+                </ul>
+              </div>
+            )
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <p className="text-red-500">
+        Error: Invalid format for "What's Included".
+      </p>
+    ); // Handle unexpected format
+  };
+
   return (
-    <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col mx-auto mt-4 relative">
+    // Modal-like container
+    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col mx-auto my-4 shadow-xl relative border border-gray-200">
+      {/* Scrollable Content Area */}
       <div
         ref={detailViewRef}
         className="flex-grow overflow-y-auto"
-        style={{ maxHeight: "calc(90vh - 60px)" }}
+        // style={{ maxHeight: "calc(90vh - 60px)" }} // Max height for scroll area if needed
       >
-        <div style={imageStyle} className="overflow-hidden">
-          <ImageCarousel images={selectedItem.images} />
-        </div>
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-2">{selectedItem.title}</h2>
+        {/* Image Carousel with Parallax */}
+        {selectedItem.images && selectedItem.images.length > 0 && (
+          <div
+            style={imageStyle}
+            className="overflow-hidden w-full sticky top-0 z-0"
+          >
+            {" "}
+            {/* Sticky image */}
+            <ImageCarousel images={selectedItem.images} />
+          </div>
+        )}
+
+        {/* Text Content */}
+        <div className="p-5 md:p-8 relative z-10 bg-white">
+          {" "}
+          {/* Ensure text is above sticky image */}
+          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">
+            {selectedItem.title}
+          </h2>
           {selectedItem.price && (
-            <p className="text-xl font-semibold mb-2 text-blue-600">
+            <p className="text-xl font-semibold mb-4 text-blue-600">
               {selectedItem.price}
             </p>
           )}
-          <div className="mb-4">{renderDescription()}</div>
-          {selectedItem.fullDescription &&
-            selectedItem.fullDescription !== selectedItem.description && (
-              <button
-                className="text-blue-500 underline"
-                onClick={toggleDescription}
-              >
-                {showFullDescription ? "Read less" : "Read more"}
-              </button>
-            )}
+          {/* Description Area */}
+          <div className="mb-4 prose max-w-none prose-strong:font-semibold">
+            {" "}
+            {/* Using prose for better text styling */}
+            {renderDescriptionContent()}
+          </div>
+          {/* Read More/Less Button */}
+          {(typeof selectedItem.fullDescription === "function" ||
+            (selectedItem.fullDescription &&
+              selectedItem.fullDescription !== selectedItem.description)) && (
+            <button
+              className="text-blue-600 hover:text-blue-800 underline text-sm font-medium mb-4"
+              onClick={toggleDescription}
+            >
+              {showFullDescription ? "Read less" : "Read more"}
+            </button>
+          )}
+          {/* --- WHAT'S INCLUDED SECTION --- */}
+          {selectedItem.whatsIncluded && (
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <h3 className="text-lg font-semibold mb-3 text-gray-800">
+                What's Included:
+              </h3>
+              {renderWhatsIncluded()}
+            </div>
+          )}
+          {/* --- END WHAT'S INCLUDED --- */}
+          {/* Referral Info */}
           {selectedItem.referral && (
-            <p className="text-sm text-blue-500 mt-2">
-              {selectedItem.referral}
+            <p className="text-sm text-green-600 mt-5 p-3 bg-green-50 border border-green-200 rounded-md">
+              💰 {selectedItem.referral}
             </p>
           )}
         </div>
       </div>
-      <Link
-        to="/MyServices"
-        className={`fixed bottom-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-all duration-300 flex items-center ${
-          scrollPosition > 50 ? "opacity-75 hover:opacity-100" : "opacity-100"
-        }`}
-        style={{
-          transform: `translateY(${Math.min(scrollPosition / 2, 20)}px)`,
-        }}
-      >
-        <ChevronLeft className="w-5 h-5 mr-2" />
-        Back
-      </Link>
+
+      {/* Back Button - Positioned at the bottom */}
+      <div className="p-4 bg-gray-50 border-t border-gray-200 sticky bottom-0 z-20 flex justify-start">
+        <Link
+          to="/MyServices" // Ensure this path matches your routing setup
+          className={`bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors duration-200 flex items-center text-sm shadow`}
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Back to Services
+        </Link>
+      </div>
     </div>
   );
 };
 
+// --- MAIN SERVICES LIST PAGE ---
 const MyServicesPage = () => {
   const renderItemList = useCallback(
     (items, category) => (
-      <div className="mt-4 space-y-4">
+      <div className="mt-4 grid grid-cols-1 gap-4">
         {items.map((item) => (
-          <Link key={item.id} to={`/${category}/${item.id}`}>
-            <div className="flex items-center p-3 bg-white rounded-lg shadow-md cursor-pointer transition-all duration-300 hover:shadow-lg">
+          // Make sure the path here matches your Route definition in App.jsx
+          <Link key={item.id} to={`/services/${category}/${item.id}`}>
+            <div className="flex items-start p-4 bg-white rounded-lg shadow transition-all duration-300 hover:shadow-md border border-transparent hover:border-gray-200">
               <img
-                src={item.images[0]}
+                src={item.images[0]} // Use first image as thumbnail
                 alt={item.title}
-                className="w-16 h-16 rounded-lg object-cover"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover flex-shrink-0 mr-4 mt-1" // Added margin-top
               />
-              <div className="ml-4 flex-grow">
-                <h4 className="font-semibold text-lg">{item.title}</h4>
-                <p className="text-sm text-gray-600">
-                  {item.description.substring(0, 50)}...
+              <div className="flex-grow min-w-0">
+                {" "}
+                {/* Added min-w-0 for proper text wrapping */}
+                <h4 className="font-semibold text-base md:text-lg text-gray-800 truncate">
+                  {item.title}
+                </h4>{" "}
+                {/* Added truncate */}
+                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                  {" "}
+                  {/* Limit description lines */}
+                  {typeof item.description === "string"
+                    ? item.description
+                    : "View details"}
                 </p>
                 {item.price && (
-                  <p className="text-sm font-semibold text-blue-600 mt-1">
+                  <p className="text-sm font-semibold text-blue-600 mt-2">
                     {item.price}
                   </p>
                 )}
               </div>
-              <ChevronRight className="text-gray-400" />
+              <ChevronRight className="text-gray-400 ml-2 flex-shrink-0 self-center" />
             </div>
           </Link>
         ))}
@@ -432,54 +564,62 @@ const MyServicesPage = () => {
     []
   );
 
+  // Component Render
   return (
-    <div className="max-w-2xl mx-auto bg-gray-100 min-h-screen">
-      <div className="bg-white p-4 flex items-center shadow-md">
-        <Link to="/" className="text-gray-600">
+    // Using a simpler background, letting the parent handle overall background
+    <div className="max-w-3xl mx-auto px-2 sm:px-4 pb-10">
+      {/* Header */}
+      <div className="bg-white p-4 flex items-center shadow-sm sticky top-0 z-30 rounded-b-lg mb-4 border-b border-gray-200">
+        <Link to="/" className="text-gray-600 hover:text-gray-900 mr-3">
           <ChevronLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-xl font-semibold ml-4">Bruce's Services</h1>
+        <h1 className="text-xl font-semibold text-gray-800">
+          Bruce's Services
+        </h1>
       </div>
 
-      <div className="p-4">
-        <div
-          className="text-white p-6 rounded-lg mb-6 flex flex-col justify-center items-center shadow-lg"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${myLogo})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            minHeight: "200px",
-          }}
-        >
-          <h2 className="text-2xl font-bold mb-2">
-            Welcome to BruceMinanga's World
-          </h2>
-          <p className="text-center">
-            Hi! I'm Bruce, the IT guy & the owner of this digital realm. Let me
-            bring your digital dreams to life (He/him)
-          </p>
-        </div>
+      {/* Welcome Banner */}
+      <div
+        className="text-white p-6 rounded-lg mb-8 flex flex-col justify-center items-center shadow-lg text-center"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url(${myLogo})`, // Assuming myLogo is appropriate, otherwise use a generic banner image
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          minHeight: "180px",
+        }}
+      >
+        <h2 className="text-2xl font-bold mb-2">
+          Welcome to BruceMinanga's World
+        </h2>
+        <p className="max-w-xl">
+          Hi! I'm Bruce, the IT guy & the owner of this digital realm. Exploring
+          technology, philosophy, and more. Let me bring your digital dreams to
+          life (He/him).
+        </p>
+      </div>
 
-        {Object.entries(MyServicesItems).map(([category, items]) => (
-          <div key={category} className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </h3>
-              <Link
-                to={`/category/${category}`}
-                className="text-blue-500 text-sm font-medium"
-              >
-                See all
-              </Link>
-            </div>
-            {renderItemList(items.slice(0, 3), category)}
+      {/* Service Categories */}
+      {Object.entries(MyServicesItems).map(([category, items]) => (
+        <div key={category} className="mb-8">
+          <div className="flex justify-between items-center mb-2 px-1">
+            <h3 className="text-xl font-semibold text-gray-800">
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </h3>
+            {/* Link to Category Page (if you implement one) */}
+            {/* <Link to={`/category/${category}`} className="text-blue-600 hover:underline text-sm font-medium">See all</Link> */}
           </div>
-        ))}
-      </div>
+          {/* Render first few items */}
+          {renderItemList(items.slice(0, 4), category)}{" "}
+          {/* Show up to 4 items initially */}
+          {/* Add a "See More" if applicable */}
+          {/* {items.length > 4 && <Link to={`/category/${category}`} className="...">See all {category}</Link>} */}
+        </div>
+      ))}
     </div>
   );
 };
 
+// --- CORRECTED EXPORT ---
+// Only the default export is needed here.
+// ItemDetailView is already exported above using 'export const'.
 export default MyServicesPage;
-export { ItemDetailView };

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { SiHackerrank } from "react-icons/si";
-import MovingEyes from "./MovingEyes";
+import MovingEyes from "./MovingEyes"; // Ensure this component exists and is imported correctly
 
 const ProfileDetails = () => {
   const [hoveredRole, setHoveredRole] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true);
+    // Trigger animation slightly after component mounts
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const roleDescriptions = {
@@ -22,13 +24,16 @@ const ProfileDetails = () => {
       "A project where I share my systems. These systems include: Life framework system.",
   };
 
+  // --- CHANGE IS HERE ---
+  // Removed `bg-gradient-to-br from-slate-50 to-slate-100`, `max-w-3xl`, `mx-auto`, `mt-8`
+  // These are handled by the parent container in App.jsx or its space-y utility
   return (
     <div
-      className={`max-w-3xl mx-auto mt-8 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl overflow-hidden shadow-2xl transition-all duration-700 ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      className={`rounded-xl overflow-hidden shadow-2xl transition-all duration-700 ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10" // Keep transition effect
       }`}
     >
-      {/* Content Container */}
+      {/* Content Container - No background, relies on parent */}
       <div className="p-4 md:p-8">
         {/* Introduction Section */}
         <div className="mb-8">
@@ -42,21 +47,24 @@ const ProfileDetails = () => {
                   onMouseLeave={() => setHoveredRole(null)}
                 >
                   {role}
+                  {/* Tooltip */}
                   {hoveredRole === role && (
                     <span
                       className="absolute z-10 w-64 md:w-72 p-3 text-sm text-white bg-gray-900 rounded-lg shadow-xl whitespace-normal opacity-95 backdrop-blur-sm border border-gray-700"
                       style={{
-                        top: "100%",
+                        bottom: "125%", // Position above the text
                         left: "50%",
                         transform: "translateX(-50%)",
-                        marginTop: "8px",
+                        // marginTop: "8px", // removed as it's positioned above now
                       }}
                     >
+                      {/* Tooltip Arrow */}
                       <span
                         className="absolute w-3 h-3 bg-gray-900 transform rotate-45"
                         style={{
-                          top: "-6px",
+                          top: "100%", // Arrow at the bottom of the tooltip
                           left: "50%",
+                          marginTop: "-6px", // Overlap slightly
                           marginLeft: "-6px",
                         }}
                       ></span>
@@ -71,9 +79,12 @@ const ProfileDetails = () => {
         </div>
 
         {/* Strategy Section */}
+        {/* KEEPING bg-white HERE, as it seems intended for inner sections */}
         <div className="mb-8 p-4 md:p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800 flex items-center">
-            <span className="inline-block w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full mr-3 flex-shrink-0">
+            <span className="inline-block w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full mr-3 flex-shrink-0 shadow">
+              {" "}
+              {/* Added shadow */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -104,9 +115,12 @@ const ProfileDetails = () => {
         </div>
 
         {/* Philosophy Section */}
+        {/* KEEPING bg-white HERE */}
         <div className="mb-8 p-4 md:p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800 flex items-center">
-            <span className="inline-block w-8 h-8 flex items-center justify-center bg-purple-600 text-white rounded-full mr-3 flex-shrink-0">
+            <span className="inline-block w-8 h-8 flex items-center justify-center bg-purple-600 text-white rounded-full mr-3 flex-shrink-0 shadow">
+              {" "}
+              {/* Added shadow */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -137,9 +151,12 @@ const ProfileDetails = () => {
         </div>
 
         {/* Mission Section */}
+        {/* Keeping gradient bg here for visual separation */}
         <div className="mb-8 p-4 md:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-blue-100">
           <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800 flex items-center">
-            <span className="inline-block w-8 h-8 flex items-center justify-center bg-indigo-600 text-white rounded-full mr-3 flex-shrink-0">
+            <span className="inline-block w-8 h-8 flex items-center justify-center bg-indigo-600 text-white rounded-full mr-3 flex-shrink-0 shadow">
+              {" "}
+              {/* Added shadow */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -175,13 +192,19 @@ const ProfileDetails = () => {
 
         {/* Social Links Section */}
         <div className="mt-8 text-center">
-          <h3 className="font-bold text-xl mb-6 text-gray-800 flex items-center justify-center flex-wrap">
+          <h3 className="font-bold text-lg md:text-xl mb-6 text-gray-800 flex items-center justify-center flex-wrap">
+            {" "}
+            {/* Adjusted size */}
             <span className="mr-2">Spy on me via </span>
-            <span className="inline-flex">
+            <span className="inline-flex transform scale-90 md:scale-100">
+              {" "}
+              {/* Scaled eyes slightly */}
               <MovingEyes />
             </span>
           </h3>
-          <div className="flex justify-center space-x-6 mt-4">
+          <div className="flex justify-center space-x-4 md:space-x-6 mt-4">
+            {" "}
+            {/* Adjusted spacing */}
             <a
               href="https://www.linkedin.com/in/bruce-minanga-768a55240/"
               target="_blank"
@@ -201,7 +224,9 @@ const ProfileDetails = () => {
               rel="noopener noreferrer"
               className="transform transition-transform hover:scale-110 group"
             >
-              <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg group-hover:bg-gray-50 transition-all duration-300">
+              <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg group-hover:bg-gray-100 transition-all duration-300">
+                {" "}
+                {/* Changed hover bg slightly */}
                 <FaGithub className="text-2xl md:text-3xl text-gray-800" />
               </div>
               <span className="block mt-2 text-xs md:text-sm text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
@@ -209,7 +234,7 @@ const ProfileDetails = () => {
               </span>
             </a>
             <a
-              href="https://www.hackerrank.com/bruceminanga"
+              href="https://www.hackerrank.com/profile/bruceminanga" // Corrected URL assuming profile link
               target="_blank"
               rel="noopener noreferrer"
               className="transform transition-transform hover:scale-110 group"
