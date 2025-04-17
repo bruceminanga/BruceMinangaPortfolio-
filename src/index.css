@@ -1,19 +1,62 @@
+/* === TAILWIND & BASE === */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Ensure base html/body have appropriate background for edge cases */
 body {
-  background-color: #f0f9ff; /* Match the lightest gradient color */
+  background-color: #f0f9ff; /* Base background */
   color: #374151; /* Default text color */
+  scroll-behavior: smooth; /* Optional: Smooth scrolling */
 }
 
-/* Footer Marquee Styles (Keep as is) */
-footer#main-footer {
+/* Class applied by JS during overscroll */
+body.overflow-hidden {
+  overflow: hidden;
+}
+
+/* Class applied by JS when near bottom */
+body.near-bottom .overscroll-indicator {
+  opacity: 0.9; /* Show near-bottom indicator */
+  animation: pulse 1.5s infinite ease-in-out; /* Add pulse animation */
+}
+
+
+/* === LAYOUT COMPONENTS === */
+
+/* --- Main Content Card --- */
+.max-w-md {
+  /* Semi-transparent background */
+  background: rgba(255, 255, 255, 0.65);
+  /* Frosted glass effect */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* Safari support */
+  /* Subtle border */
+  border: 1px solid rgba(219, 234, 254, 0.4);
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+  overflow: hidden; /* Contain the blur */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border 0.3s ease;
+  padding: 1.5rem; /* Inner padding */
+}
+
+.max-w-md:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.15), 0 10px 10px -5px rgba(59, 130, 246, 0.1);
+}
+
+/* --- Footer --- */
+#main-footer {
+  position: relative; /* Keep relative for stacking */
+  z-index: 10; /* Ensure above background */
+  /* Apply similar transparency/blur */
+  background: rgba(248, 249, 250, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(219, 234, 254, 0.5); /* Subtle top border */
   color: #005675;
-  font-size: 14px; /* Slightly smaller footer text */
+  font-size: 14px;
   padding: 1rem 0;
-  /* background-color: #f8f9fa; */ /* Replaced by transparent background below */
+  margin-top: auto; /* Pushes footer to bottom if content is short */
 }
 
 .marquee-container {
@@ -36,34 +79,36 @@ footer#main-footer {
   padding-right: 80px; /* Spacing between quotes */
 }
 
-@keyframes marquee {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(-100%, 0);
-  }
-}
 
+/* === ANIMATED BACKGROUND === */
 
-/* --- Animated Background Styles --- */
+/* --- General Container & State --- */
 .animated-background {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0; /* Behind content */
+  z-index: 0; /* Behind content by default */
   overflow: hidden;
-  pointer-events: none; /* Allow clicks to pass through */
+  pointer-events: none; /* Allow clicks to pass through by default */
 }
 
+/* Styles when actively overscrolling */
+.animated-background.overscrolling {
+  z-index: 50; /* Bring background slightly forward during overscroll, but below button */
+  /* Note: background color/gradient change can be handled by JS state or specific classes */
+  pointer-events: auto; /* Enable pointer events for the container (allows exit button) */
+}
+
+/* --- Gradient --- */
 .gradient-bg {
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
+  /* Complex background gradient */
   background:
     radial-gradient(circle at 80% 10%, rgba(119, 160, 255, 0.15) 0%, rgba(59, 130, 246, 0) 30%),
     radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0) 30%),
@@ -72,46 +117,48 @@ footer#main-footer {
     linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #dbeafe 50%, #ede9fe 75%, #fae8ff 100%);
   transform-origin: center;
   animation: gradientShift 20s ease-in-out infinite alternate;
+  will-change: transform; /* Hint for animation */
 }
 
+/* --- Particles --- */
 .floating-particle {
   position: absolute;
   border-radius: 50%;
-  background-color: rgba(59, 130, 246, 0.2); /* Reduced opacity */
+  background-color: rgba(59, 130, 246, 0.2); /* Base color */
   filter: blur(1px);
   animation: float 20s ease-in-out infinite alternate;
+  will-change: transform; /* Hint for animation */
 }
 .floating-particle:nth-child(even) { background-color: rgba(139, 92, 246, 0.2); }
 .floating-particle:nth-child(3n) { background-color: rgba(236, 72, 153, 0.2); }
 .floating-particle:nth-child(4n) { background-color: rgba(20, 184, 166, 0.2); }
 
-/* --- UPDATED Floating Concept Base Styles --- */
+/* --- Concepts (Base & Active) --- */
 .floating-concept {
   position: absolute;
-  font-size: 6rem; /* Base size, adjusted in media queries */
+  font-size: 6rem; /* Base size */
   font-weight: 800;
-  opacity: 0.2; /* Default visibility - ADJUST AS NEEDED (e.g., 0.15, 0.25) */
+  opacity: 0.2; /* Default visibility */
   transform-origin: center;
   animation: floatText 30s ease-in-out infinite alternate;
   white-space: nowrap;
   user-select: none;
-  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); /* Smooth transitions for opacity, transform, etc. */
-  /* Subtle base text shadow to help separate from background */
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); /* Smooth transitions for JS style changes */
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  will-change: transform, opacity; /* Hint for animation/transitions */
 }
 
-/* --- UPDATED Active Concept Styles --- */
+/* Style for the concept highlighted during normal scroll */
 .active-concept {
-  /* No floating animation when active */
-  animation: none !important;
-  /* Use text-shadow for glow effect - looks cleaner than filter: drop-shadow */
+  animation: pulseGlow 2.5s infinite ease-in-out !important; /* Override floatText */
+  /* Glow effect using text-shadow */
   text-shadow: 0 0 30px rgba(255, 255, 255, 0.9), 0 0 15px rgba(255, 255, 255, 0.7);
-  /* Add pulsing animation to the glow */
-  animation: pulseGlow 2.5s infinite ease-in-out !important;
+  /* Opacity/transform are handled by inline styles from JS */
 }
 
+/* --- Scroll Indicator (Initial / Normal Scroll) --- */
 .scroll-indicator {
-  position: absolute;
+  position: absolute; /* Changed from fixed to absolute within .animated-background */
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
@@ -119,7 +166,8 @@ footer#main-footer {
   flex-direction: column;
   align-items: center;
   animation: fadeInOut 2s ease-in-out infinite;
-  z-index: 1; /* Ensure it's above particles/gradient */
+  z-index: 1; /* Above particles/gradient */
+  /* Opacity controlled by inline styles from JS */
 }
 .scroll-icon {
   width: 24px;
@@ -147,69 +195,105 @@ footer#main-footer {
 }
 
 
-/* --- UPDATED Main Content Container Style --- */
-.max-w-md {
-  /* Semi-transparent background */
-  /* ADJUST alpha (0.65) for more/less transparency */
-  background: rgba(255, 255, 255, 0.65);
-
-  /* Frosted glass effect */
-  /* ADJUST blur amount (8px) */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px); /* Safari support */
-
-  /* Subtle border to define edges */
-  /* ADJUST color/opacity (0.4) */
-  border: 1px solid rgba(219, 234, 254, 0.4);
-
-  border-radius: 1rem; /* Keep rounded corners */
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
-  overflow: hidden; /* Important to contain the blur */
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border 0.3s ease;
-
-  /* Add padding INSIDE the container */
-  padding: 1.5rem; /* ADJUST as needed */
+/* --- Overscroll Specific Styles --- */
+.overscroll-concept {
+  /* Inherits base .floating-concept styles */
+  /* Override or add styles specific to overscroll */
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.5);
+  /* Font size, opacity, position, transform handled by inline styles from JS */
+  animation: float-in 0.8s forwards; /* Simple fade/float-in animation */
+  letter-spacing: 1px;
+  pointer-events: none; /* Make sure text doesn't interfere */
 }
 
-.max-w-md:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.15), 0 10px 10px -5px rgba(59, 130, 246, 0.1);
-  /* Optional: Slightly change background/border on hover */
-  /* background: rgba(255, 255, 255, 0.7); */
-  /* border: 1px solid rgba(219, 234, 254, 0.6); */
+/* Near Bottom Indicator (Visible when body has .near-bottom) */
+.overscroll-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0; /* Hidden by default, shown via body.near-bottom */
+  transition: opacity 0.3s ease;
+  text-align: center;
+  color: #374151; /* Darker color to be visible on light background */
+  z-index: 100; /* Above background, below button */
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.5); /* Light shadow for definition */
 }
 
-/* --- UPDATED Footer Style --- */
-#main-footer {
-  position: relative; /* Keep relative for stacking */
-  z-index: 10; /* Ensure above background */
-  /* Apply similar transparency/blur */
-  background: rgba(248, 249, 250, 0.7); /* Original color with alpha - ADJUST */
-  backdrop-filter: blur(8px); /* ADJUST */
-  -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(219, 234, 254, 0.5); /* Subtle top border */
-  /* Keep other specific footer styles */
-  color: #005675;
+.indicator-arrow {
+  font-size: 2rem;
+  line-height: 1;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+.indicator-text {
+  font-size: 0.8rem; /* Slightly smaller */
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Exit Button (Visible during overscroll) */
+.exit-background-btn {
+  position: fixed; /* Fixed to viewport */
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.2); /* Slightly different background */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #374151; /* Dark text */
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 1000; /* Highest */
   font-size: 14px;
-  padding: 1rem 0;
-  margin-top: auto; /* Pushes footer to bottom if content is short */
+  font-weight: 600; /* Bolder */
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  opacity: 0; /* Hidden by default, shown via inline style from JS */
+  pointer-events: auto !important; /* Ensure clickable whenever rendered */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
-/* Keyframe Animations (Keep as is or adjust timings) */
+.exit-background-btn:hover,
+.exit-background-btn:focus {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+
+/* === KEYFRAME ANIMATIONS === */
+@keyframes marquee {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
+}
+
 @keyframes gradientShift {
   0% { transform: rotate(0deg) scale(1); }
   100% { transform: rotate(5deg) scale(1.05); }
 }
+
 @keyframes float {
   0% { transform: translate(0, 0); }
   50% { transform: translate(10px, 15px); }
   100% { transform: translate(-10px, -15px); }
 }
+
 @keyframes floatText {
   0% { transform: translate(0, 0) rotate(0deg); }
   50% { transform: translate(20px, 15px) rotate(2deg); }
   100% { transform: translate(-20px, -15px) rotate(-2deg); }
 }
+
+/* Used for .active-concept */
+@keyframes pulseGlow {
+  0%, 100% { text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 8px rgba(255, 255, 255, 0.5); }
+  50% { text-shadow: 0 0 40px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8); }
+}
+
+/* Used for initial .scroll-indicator */
 @keyframes fadeInOut {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.8; }
@@ -221,187 +305,62 @@ footer#main-footer {
   100% { top: 8px; opacity: 1; }
 }
 
-/* --- UPDATED Pulse Glow using text-shadow --- */
-@keyframes pulseGlow {
-  0%, 100% { text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 8px rgba(255, 255, 255, 0.5); }
-  50% { text-shadow: 0 0 40px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8); }
+/* Used for .overscroll-concept */
+@keyframes float-in {
+  0% { transform: translateY(30px) scale(0.9); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; } /* Let final opacity be set by JS */
 }
 
-/* Responsive Adjustments */
+/* Used for .indicator-arrow */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+/* Used for .overscroll-indicator via body.near-bottom */
+@keyframes pulse {
+  0% { opacity: 0.6; } /* Start slightly more visible */
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+
+/* === RESPONSIVE STYLES === */
 @media (max-width: 768px) {
   .floating-concept {
-    font-size: 4rem; /* Smaller text on tablets */
+    font-size: 4rem; /* Smaller concept text */
   }
   .max-w-md {
-    padding: 1.25rem; /* Adjust padding */
+    padding: 1.25rem; /* Adjust card padding */
   }
 }
 
 @media (max-width: 640px) {
-  .floating-concept {
-    font-size: 3rem; /* Smaller text on phones */
+  main { /* Adjust main padding */
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    padding-left: 1rem; /* Add horizontal padding to main */
+    padding-right: 1rem;
   }
   .max-w-md {
-    padding: 1rem; /* Adjust padding */
-    margin-left: 1rem; /* Add some horizontal margin on small screens */
-    margin-right: 1rem;
-    max-width: calc(100% - 2rem); /* Ensure it doesn't touch edges */
+    /* Remove specific margins, let main padding handle spacing */
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%; /* Take full width within main padding */
+    padding: 1rem;
   }
-  main {
-    padding-top: 4rem; /* Less padding on main for small screens */
-    padding-bottom: 4rem;
+  .floating-concept {
+    font-size: 3rem; /* Even smaller concept text */
   }
   #main-footer {
     font-size: 12px; /* Smaller footer text */
   }
-}
-
-/* Add these to your index.css file */
-
-.animated-background.overscrolling {
-  z-index: 999;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-.overscroll-concept {
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.5);
-  font-size: calc(1.5rem + 1vw);
-  letter-spacing: 1px;
-}
-
-/* Optional animation for overscroll concepts */
-@keyframes float-in {
-  0% { transform: translateY(30px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-.overscroll-concept {
-  animation: float-in 0.8s forwards;
-}
-
-/* Overscroll experience styles */
-.animated-background.overscrolling {
-  z-index: 999;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #0f1729 0%, #1a1c2c 100%);
-  transition: all 0.5s ease-in-out;
-}
-
-.overscroll-concept {
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.5);
-  letter-spacing: 1px;
-  pointer-events: none;
-}
-
-/* Visible indicator when near the bottom */
-.overscroll-indicator {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  text-align: center;
-  color: white;
-  z-index: 100;
-  pointer-events: none;
-}
-
-body.near-bottom .overscroll-indicator {
-  opacity: 0.9;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-.indicator-arrow {
-  font-size: 2rem;
-  animation: bounce 2s infinite;
-}
-
-.indicator-text {
-  font-size: 1rem;
-  margin-top: 8px;
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
+  .exit-background-btn {
+     font-size: 13px; /* Adjust button size */
+     padding: 6px 12px;
   }
-  40% {
-    transform: translateY(-10px);
+  .indicator-text {
+      font-size: 0.75rem; /* Adjust indicator text */
   }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes pulse {
-  0% { opacity: 0.4; }
-  50% { opacity: 0.9; }
-  100% { opacity: 0.4; }
-}
-
-/* Exit button styles */
-.exit-background-btn {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  z-index: 1000;
-  font-size: 14px;
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-}
-
-.exit-background-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateX(-50%) translateY(-2px);
-}
-
-/* Make body non-scrollable in background mode */
-body.overflow-hidden {
-  overflow: hidden;
-}
-
-/* Background scrolling styles */
-.animated-background.at-bottom .gradient-bg {
-  opacity: 0.8;
-  transition: opacity 0.5s ease;
-}
-
-@keyframes float-in {
-  0% { transform: translateY(30px) scale(0.9); opacity: 0; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-.overscroll-concept {
-  animation: float-in 0.8s forwards;
-}
-
-/* Add to your index.css */
-.animated-background.overscrolling {
-  pointer-events: auto; /* Enable pointer events when overscrolling */
-}
-
-.exit-background-btn {
-  pointer-events: auto !important; /* Ensure button is always clickable */
-}
-
-/* Make sure the button is visible in all scenarios */
-.exit-background-btn:hover, 
-.exit-background-btn:focus {
-  background: rgba(255, 255, 255, 0.35); /* More visible on hover */
 }
