@@ -10,10 +10,6 @@ const ProfileDetails = () => {
       "Proficient in both frontend(JavaScript, React, Bootstrap, CSS, Tailwind) and backend technologies (Python, Django).",
     "DevOps Engineer":
       "Experienced in managing Linux systems and implementing DevOps practices for efficient software delivery.",
-    "Philosopher":
-      "Passionate about exploring deep questions and applying philosophical concepts to problem-solving.",
-    "Philanthropist":
-      "Dedicated to creating positive social impact through strategic giving and sustainable community initiatives.",
     "Owner of BruceMinangas.world":
       "A project where I share my systems. These systems include: Life framework system.",
   };
