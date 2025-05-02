@@ -27,25 +27,40 @@ import myLogo from "../../assets/images/My-logo.png";
 
 // Helper to format description with bold text
 const formatDescription = (text) => {
-  // Ensure text is a string before splitting
   if (typeof text !== "string") {
     console.warn("formatDescription received non-string input:", text);
-    return text; // Return original if not a string
+    return text;
   }
-  return text
-    .split("*")
-    .map((part, index) =>
-      index % 2 === 0 ? part : <strong key={index}>{part}</strong>
+
+  // Split by markdown links first
+  const parts = text.split(/(\[.*?\]\(.*?\))/g);
+  
+  return parts.map((part, index) => {
+    // Check if this part is a markdown link
+    const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
+    if (linkMatch) {
+      const [_, linkText, linkUrl] = linkMatch;
+      return (
+        <BlogLink key={index} href={linkUrl}>
+          {linkText}
+        </BlogLink>
+      );
+    }
+    
+    // Handle bold text with asterisks
+    return part.split("*").map((subPart, subIndex) =>
+      subIndex % 2 === 0 ? subPart : <strong key={`${index}-${subIndex}`}>{subPart}</strong>
     );
+  });
 };
 
 // Reusable Blog Link component
 const BlogLink = ({ href, children }) => (
-  <a // Changed to <a> for external links
+  <a
     href={href}
-    target="_blank" // Open in new tab
-    rel="noopener noreferrer" // Security measure
-    className="text-blue-600 hover:text-blue-800 hover:underline block mb-2"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 hover:text-blue-800 hover:underline inline"
   >
     {children}
   </a>
@@ -173,96 +188,39 @@ Unlike other local people who fix clients machines:
       // --- END ---
     },
   ],
-  interests: [
-    {
-      id: "Blogging",
-      title: "Blogging, Stories & Mindset Education",
-      description:
-        "Sharing insights on tech, life, and growth mindset via LinkedIn.",
-      fullDescription: () => (
-        // Using function for complex JSX structure
-        <>
-          <p className="mb-3">
-            Insights and stories shared primarily on LinkedIn.
-          </p>
-          <h3 className="font-bold text-lg mb-2 text-gray-800">
-            Featured Blogs:
-          </h3>
-          <div className="mb-4 space-y-1">
-            <BlogLink href="https://www.linkedin.com/pulse/saying-techy-words-doesnt-make-us-bruce-minanga-zsj5f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D">
-              1. Saying Techy Words Doesn't Make Us Techy
-            </BlogLink>
-            <BlogLink href="https://www.linkedin.com/pulse/understanding-computer-programming-languages-bruce-minanga-sy47f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D">
-              2. Understanding Computer Programming Languages (Series)
-            </BlogLink>
-            <BlogLink href="https://www.linkedin.com/pulse/linux-philosophy-bruce-minanga-dqevf/">
-              3. Linux Philosophy (Series)
-            </BlogLink>
-            <BlogLink href="https://www.linkedin.com/pulse/game-theory-bruce-minanga-73anf/">
-              4. The Game Theory
-            </BlogLink>
-          </div>
-
-          <h3 className="font-bold text-lg mt-5 mb-2 text-gray-800">
-            Stories:
-          </h3>
-          <p className="mb-4">
-            Includes personal narratives like "My Tech Journey".
-          </p>
-
-          <h3 className="font-bold text-lg mt-5 mb-2 text-gray-800">
-            Mindset Education:
-          </h3>
-          <p className="mb-2">
-            Focusing on the power of mindset – your beliefs about your
-            capabilities.
-          </p>
-          <h4 className="font-semibold mt-3 mb-1 text-gray-700">
-            Types of Mindset:
-          </h4>
-          <ol className="list-decimal list-inside space-y-1 mb-3">
-            <li>*Fixed Mindset:* Believing abilities are static.</li>
-            <li>
-              *Growth Mindset:* Believing abilities can be developed through
-              effort.
-            </li>
-          </ol>
-          <h4 className="font-semibold mt-3 mb-1 text-gray-700">
-            Application:
-          </h4>
-          <ol className="list-decimal list-inside space-y-1">
-            <li>*Work:* Fostering innovation and learning from setbacks.</li>
-            <li>*Relationships:* Building stronger connections.</li>
-            <li>*Health:* Adopting and maintaining healthy habits.</li>
-          </ol>
-        </>
-      ),
-      images: [blogging1, blogging2, blogging3],
-    },
+  interests: [  
     {
       id: "philosophy",
-      title: "Philosophy, Psychology & History",
+      title: "Philosophy, Philanthropy And History",
       description:
-        "Exploring philosophical concepts, psychological insights, and historical context.",
-      fullDescription: `Since September 2023, I've delved into philosophy, psychology, and history to better understand the world and human behavior. Philosophy helps challenge constructs, psychology enhances understanding of people, and history provides context.
+        "Exploring philosophical concepts, philanthropy, and historical context.",
+      fullDescription: `In September of 2023, I started to learn relevant  philosophical concepts which helps in rewiring my brain to get me out of inappropriate social constructs, logical fallacies & embracing conspiracy theories created by some corporates & our ancestors.
+- Learning philosophy of psychology makes my life better & learning history makes me know where i came from & predict where I'm heading to.
 *Key Findings:*
-1. Philosophers offer perspectives, not absolute truths.
-2. Philosophy aids in understanding others' thoughts.
-3. Foundational ideas (often philosophical) shape the world.
+1. Philosophers can be wrong; they present to you their thoughts 🤷🏽‍♂️ 
+2. It's easier to understand people's thoughts when you are a philosopher.
+3. Philosophers run the world.
 
-*Favorite Philosophical Concepts:*
-1. Solipsism (as a thought experiment).
-2. Empiricism vs. Rationalism (sources of knowledge).
-3. Stoicism & Resilience (enduring hardship).
+*My best philosophy of epistemology concepts:*
+1. Solipsism: You & only you exist, therefore Compete with yourself, not others. 
+2. Empiricism: The source of human knowledge is experience.
+3. Rationalism: Reason & logic are the primary sources of knowledge & truth.
+*My best philosophy of ethics concepts*
+1. Resilience & Stoicism. Ability to endure Destructions
+*My best philosophy of Decison theory/Strategic Interaction concepts*
+1. The game theory. Life is a challenging fun game, Learn how to play it.(Jumanji)
+*My best philosophy of psychology concepts:*
+1. Halo effect. One good aspect of a product/person making people create a general opinion
+2. Habituation. Decrease in response to repetitive stimuli
+*Psychological concepts I can't entirely agree fully with:*
+1. Synchronicity. Coincidences
 
-*Interesting Psychological Concepts:*
-1. Halo Effect (judgment based on first impressions).
-2. Habituation (desensitization to stimuli).
-3. Synchronicity (meaningful coincidences - viewed with healthy skepticism).
+*Fun history:*
+1. Revolutions eg Agrarian revolutions, political revolutions, Cultural/social revolution, Sexual revolution etc
+*Horror history*
+1. Dark ages. A period between 5th-15th century.
 
-*Historical Awareness:* Understanding periods like the Dark Ages provides perspective on progress.
-
-*Note:* Selling intellectual property requires careful consideration of legal and ethical aspects. The "philosophical solution package" concept needs refinement.`,
+I am selling each package of a successful philosophical concept (Intellectual property) at ksh500`,
       images: [philosophyImage],
     },
     {
@@ -295,14 +253,34 @@ Unlike other local people who fix clients machines:
       id: "teaching",
       title: "Teaching & Public speaking",
       description: "Sharing knowledge in programming and technology.",
-      fullDescription: `Passionate about disseminating knowledge gained through experience.
-*Teaching Services (KES 100 per hour):*
-1️⃣ Programming Fundamentals & Specific Languages (Specify which ones you teach)
+      fullDescription: `I love to spread the knowledge i gained throughout my work to the world. I do teach the following:
+1. Programming & Tech with some Philosophical Concepts
+2. Mindset Education. Mindset is like a way of thinking. It's what you believe about yourself and what you can do.
 
-*Public Speaking Services (KES 3000 per hour + Transport):*
-Available to speak on topics related to Science, Technology, and Engineering.`,
+*Types of mindset*
+1. Fixed mindset. It's when you believe you can't get better at something, no matter how hard you try
+2. Growth mindset. It's when you believe you can get better at something if you keep trying and practising. Those who cannot change their minds, cannot change anything
+3. False growth mindset. Having surface level belief in improvement without engaging in the actual behaviour that lead to growth 
+
+*Applying mindset principles*
+1. At work. Encourage innovation & learning from mistakes 
+2. In relationship. Build stronger connections and resolve conflicts
+3. Health and wellness. Adopt and maintain healthy habits
+
+I teach in form of blogging & story telling
+
+*Featured Blogs:*
+[1. Saying Techy Words Doesn't Make Us Techy](https://www.linkedin.com/pulse/saying-techy-words-doesnt-make-us-bruce-minanga-zsj5f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D)
+[2. Understanding Computer Programming Languages (Series)](https://www.linkedin.com/pulse/understanding-computer-programming-languages-bruce-minanga-sy47f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D)
+[3. Linux Philosophy (Series)](https://www.linkedin.com/pulse/linux-philosophy-bruce-minanga-dqevf/)
+[4. The Game Theory](https://www.linkedin.com/pulse/game-theory-bruce-minanga-73anf/)
+
+*My Stories include:*
+1. My tech journey
+
+You can also Hire me as a public speaker to talk about my projects`,
       images: [teachingImage],
-      price: "KES 100/hr (Teaching), KES 3000/hr (Speaking)", // Example combined pricing info
+      price: "KES 100/hr (Teaching), KES 3000/hr (Speaking)",
     },
     {
       id: "family-time",

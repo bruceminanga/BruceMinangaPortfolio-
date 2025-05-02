@@ -9,6 +9,7 @@ const AnimatedBackground = () => {
   const [backgroundScroll, setBackgroundScroll] = useState(0); // How "deep" into the overscroll we are
   const overscrollDepth = 1000; // Max depth of the background scroll effect
   const [normalScrollPosition, setNormalScrollPosition] = useState(0); // Keep track for normal parallax
+  const [isNearBottom, setIsNearBottom] = useState(false); // Explicit state for near bottom detection
 
   const backgroundRef = useRef(null);
   const isWheelingRef = useRef(false); // Ref to track if wheel event is actively being processed
@@ -45,12 +46,14 @@ const AnimatedBackground = () => {
     if (isOverscrolling) {
       document.body.classList.add('overflow-hidden');
       document.body.classList.remove('near-bottom'); // Ensure near-bottom hint is removed
+      setIsNearBottom(false); // Reset near bottom state when overscrolling
     } else {
       document.body.classList.remove('overflow-hidden');
     }
     // Cleanup function to ensure class is removed if component unmounts while overscrolling
     return () => {
       document.body.classList.remove('overflow-hidden');
+      document.body.classList.remove('near-bottom');
     };
   }, [isOverscrolling]);
 
@@ -59,34 +62,39 @@ const AnimatedBackground = () => {
   useEffect(() => {
     let nearBottomTimeout;
 
-    const handleScroll = () => {
-       // Only update normal scroll position if not currently processing a wheel event
-       // that might lead to overscrolling. This helps prevent conflicts.
-      if (!isWheelingRef.current) {
-          const position = window.pageYOffset;
-          setNormalScrollPosition(position);
-
-          // --- Near Bottom Indicator Logic ---
-          const windowHeight = window.innerHeight;
-          const docHeight = document.documentElement.scrollHeight; // Use documentElement for consistency
-          const scrollableHeight = docHeight - windowHeight;
-          const bottomThreshold = scrollableHeight - 50; // 50px from actual bottom
-
-          const isNearBottom = scrollableHeight > 0 && position >= bottomThreshold && !isOverscrolling;
-
-          if (isNearBottom) {
-              clearTimeout(nearBottomTimeout);
-              if (!document.body.classList.contains('near-bottom')) {
-                   document.body.classList.add('near-bottom');
-              }
+    const checkIfNearBottom = () => {
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const scrollableHeight = docHeight - windowHeight;
+      const scrollTop = window.pageYOffset;
+      const bottomThreshold = scrollableHeight - 100; // Increased from 50px to 100px for earlier detection
+      
+      // Only update near bottom status if we're not already overscrolling
+      if (!isOverscrolling) {
+        const shouldBeNearBottom = scrollableHeight > 0 && scrollTop >= bottomThreshold;
+        
+        if (shouldBeNearBottom !== isNearBottom) {
+          setIsNearBottom(shouldBeNearBottom);
+          
+          if (shouldBeNearBottom) {
+            document.body.classList.add('near-bottom');
           } else {
-               if (document.body.classList.contains('near-bottom')) {
-                  // Delay removal slightly to avoid flickering if user scrolls back/forth near edge
-                  nearBottomTimeout = setTimeout(() => {
-                     document.body.classList.remove('near-bottom');
-                  }, 300);
-               }
+            clearTimeout(nearBottomTimeout);
+            nearBottomTimeout = setTimeout(() => {
+              document.body.classList.remove('near-bottom');
+            }, 300);
           }
+        }
+      }
+    };
+
+    const handleScroll = () => {
+      // Only update normal scroll position if not currently processing a wheel event
+      // that might lead to overscrolling. This helps prevent conflicts.
+      if (!isWheelingRef.current) {
+        const position = window.pageYOffset;
+        setNormalScrollPosition(position);
+        checkIfNearBottom(); // Check near bottom status on every scroll
       }
     };
 
@@ -134,6 +142,8 @@ const AnimatedBackground = () => {
         else if (!e.defaultPrevented) {
              // Allow default scroll to happen and update our tracked normal scroll position
             setNormalScrollPosition(window.pageYOffset + e.deltaY);
+            // Check if we should update the near bottom status after scrolling
+            setTimeout(checkIfNearBottom, 10);
         }
 
         // Reset the wheeling flag after a short delay to allow scroll updates to catch up
@@ -142,22 +152,27 @@ const AnimatedBackground = () => {
         }, 50);
     };
 
+    // Run the check immediately when the component mounts
+    checkIfNearBottom();
+
     // Add Listeners
     window.addEventListener('scroll', handleScroll, { passive: true }); // Normal scroll can be passive
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('wheel', handleWheel, { passive: false }); // Wheel needs to be active to preventDefault
+    // Also check when window is resized
+    window.addEventListener('resize', checkIfNearBottom, { passive: true });
 
     // Cleanup
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('resize', checkIfNearBottom);
       document.body.classList.remove('overflow-hidden', 'near-bottom'); // Ensure cleanup
       clearTimeout(nearBottomTimeout);
     };
     // Rerun effect if overscroll status changes to correctly manage listeners/classes if needed
-    // Also include exitBackgroundMode in dependency array if its definition could change (though useCallback helps)
-  }, [isOverscrolling, exitBackgroundMode]);
+  }, [isOverscrolling, isNearBottom, exitBackgroundMode]);
 
   // --- Particle Generation ---
   const particles = React.useMemo(() => Array(30).fill().map((_, i) => ({
@@ -275,11 +290,36 @@ const AnimatedBackground = () => {
       })}
 
 
-      {/* --- Bottom Indicator (Near Bottom Hint) --- */}
-      {/* This is now controlled by the 'near-bottom' class on the BODY tag in CSS */}
-      <div className="overscroll-indicator"> {/* Style this using .near-bottom .overscroll-indicator in CSS */}
-          <div className="indicator-arrow">↓</div>
-          <div className="indicator-text">Scroll to explore concepts</div>
+      {/* --- Improved Bottom Indicator --- */}
+      <div 
+        className={`overscroll-indicator ${isNearBottom ? 'visible' : ''}`} 
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '50%',
+          transform: `translateX(-50%) translateY(${isNearBottom ? '0' : '100%'})`,
+          background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+          color: 'white',
+          padding: '10px 20px',
+          borderRadius: '50px',
+          boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
+          zIndex: 99,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          transition: 'transform 0.3s ease, opacity 0.3s ease',
+          opacity: isNearBottom ? 1 : 0,
+          pointerEvents: 'none', // Let events pass through to content beneath
+        }}
+      >
+        <div className="indicator-arrow" style={{
+          fontSize: '1.2rem',
+          animation: 'bounce 1s infinite alternate',
+        }}>↓</div>
+        <div className="indicator-text" style={{
+          fontSize: '0.9rem',
+          fontWeight: '600',
+        }}>Scroll to explore concepts</div>
       </div>
 
 
@@ -320,6 +360,14 @@ const AnimatedBackground = () => {
           Return to Content ↑
         </button>
       )}
+
+      {/* Add CSS animation keyframes for the bounce effect */}
+      <style jsx>{`
+        @keyframes bounce {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-5px); }
+        }
+      `}</style>
     </div>
   );
 };
