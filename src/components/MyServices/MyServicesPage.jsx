@@ -7,7 +7,6 @@ import {
   useParams,
 } from "react-router-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import ImageCarousel from "./ImageCarousel"; // Ensure this component exists
 
 // Note: Replace these with your actual image imports
 import logoMakerImage from "../../assets/images/logomaker.jpg";
@@ -25,6 +24,85 @@ import blogging2 from "../../assets/images/blogging2.jpg";
 import blogging3 from "../../assets/images/blogging3.jpg";
 import myLogo from "../../assets/images/My-logo.png";
 
+// ImageCarousel Component (Fixed - was missing)
+const ImageCarousel = ({ images }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (!images || images.length === 0) {
+    return (
+      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+        No images
+      </div>
+    );
+  }
+
+  if (images.length === 1) {
+    return (
+      <img
+        src={images[0]}
+        alt="Service"
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.target.src =
+            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23ddd"/><text x="50" y="50" text-anchor="middle" dy=".3em">No Image</text></svg>';
+        }}
+      />
+    );
+  }
+
+  const nextImage = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <div className="relative w-full h-full">
+      <img
+        src={images[currentIndex]}
+        alt={`Service ${currentIndex + 1}`}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.target.src =
+            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23ddd"/><text x="50" y="50" text-anchor="middle" dy=".3em">No Image</text></svg>';
+        }}
+      />
+
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={prevImage}
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={nextImage}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentIndex ? "bg-white" : "bg-white bg-opacity-50"
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 // Helper to format description with bold text
 const formatDescription = (text) => {
   if (typeof text !== "string") {
@@ -34,7 +112,7 @@ const formatDescription = (text) => {
 
   // Split by markdown links first
   const parts = text.split(/(\[.*?\]\(.*?\))/g);
-  
+
   return parts.map((part, index) => {
     // Check if this part is a markdown link
     const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
@@ -46,11 +124,17 @@ const formatDescription = (text) => {
         </BlogLink>
       );
     }
-    
+
     // Handle bold text with asterisks
-    return part.split("*").map((subPart, subIndex) =>
-      subIndex % 2 === 0 ? subPart : <strong key={`${index}-${subIndex}`}>{subPart}</strong>
-    );
+    return part
+      .split("*")
+      .map((subPart, subIndex) =>
+        subIndex % 2 === 0 ? (
+          subPart
+        ) : (
+          <strong key={`${index}-${subIndex}`}>{subPart}</strong>
+        )
+      );
   });
 };
 
@@ -188,7 +272,7 @@ Unlike other local people who fix clients machines:
       // --- END ---
     },
   ],
-  interests: [  
+  interests: [
     {
       id: "philosophy",
       title: "Philosophy, Philanthropy And History",
@@ -512,6 +596,10 @@ const MyServicesPage = () => {
                 src={item.images[0]} // Use first image as thumbnail
                 alt={item.title}
                 className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover flex-shrink-0 mr-4 mt-1" // Added margin-top
+                onError={(e) => {
+                  e.target.src =
+                    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23ddd"/><text x="50" y="50" text-anchor="middle" dy=".3em">No Image</text></svg>';
+                }}
               />
               <div className="flex-grow min-w-0">
                 {" "}
@@ -520,9 +608,16 @@ const MyServicesPage = () => {
                   {item.title}
                 </h4>{" "}
                 {/* Added truncate */}
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                <p
+                  className="text-sm text-gray-600 mt-1 overflow-hidden"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
                   {" "}
-                  {/* Limit description lines */}
+                  {/* Fixed line-clamp-2 issue */}
                   {typeof item.description === "string"
                     ? item.description
                     : "View details"}
