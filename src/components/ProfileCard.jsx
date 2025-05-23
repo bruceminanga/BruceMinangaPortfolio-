@@ -209,7 +209,7 @@ const ProfileCard = () => {
                 d="M13 10V3L4 14h7v7l9-11h-7z"
               />{" "}
             </svg>
-            MyServices
+            Playground
           </button>
           <button
             className="flex items-center px-3 py-2 bg-blue-500 rounded-md text-white text-sm hover:bg-blue-600 transition-colors"
