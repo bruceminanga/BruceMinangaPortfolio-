@@ -4,16 +4,6 @@ import { SiHackerrank } from "react-icons/si";
 import MovingEyes from "./MovingEyes";
 
 const ProfileDetails = () => {
-  // --- CONSTANTS (Defined before hooks that use them) ---
-  const roleDescriptions = {
-    "Full-Stack Developer":
-      "Proficient in both frontend(JavaScript, React, Bootstrap, CSS, Tailwind) and backend technologies (Python, Django).",
-    "DevOps Engineer":
-      "Experienced in managing Linux systems and implementing DevOps practices for efficient software delivery.",
-    "Owner of BruceMinangas.world":
-      "A project showcasing my own unique perceptual world. Wanna explore my world? Then hire me or use my systems!",
-  };
-
   const testimonials = [
     {
       text: "Bruce's strategy of focusing on core principles rather than just tools has completely transformed how our team approaches new technology. We're adapting much faster to industry changes.",
@@ -110,40 +100,6 @@ const ProfileDetails = () => {
     >
       {/* Overall Padding */}
       <div className="p-4 md:p-6">
-        {/* --- Introduction Section (FIXED NESTING) --- */}
-        <div className="mb-6 md:mb-8">
-          <p className="text-sm md:text-base leading-relaxed text-gray-700">
-            👋 Hi, I'm Bruce the IT guy,{" "}
-            {Object.keys(roleDescriptions).map((role, index) => (
-              <span key={index} className="group relative inline-block mx-1">
-                {/* Trigger Text */}
-                <span className="inline-block cursor-pointer font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300 border-b border-dotted border-blue-400 hover:border-blue-600">
-                  {role}
-                </span>
-
-                {/* Tooltip Span */}
-                {/* *** CHANGED w-64 to max-w-xs *** */}
-                <span
-                  className="invisible absolute z-50 max-w-xs p-4 bg-gray-900 text-white text-sm rounded-lg
-                              shadow-lg opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity
-                              duration-300 bottom-full left-1/2 transform -translate-x-1/2 mb-2
-                              pointer-events-none"
-                >
-                  {/* Triangle */}
-                  <span
-                    className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0
-                                border-l-8 border-r-8 border-t-8
-                                border-l-transparent border-r-transparent border-t-gray-900"
-                  ></span>
-                  {roleDescriptions[role]}
-                </span>
-                {/* Comma/Period */}
-                {index < Object.keys(roleDescriptions).length - 1 ? ", " : "."}
-              </span>
-            ))}
-          </p>
-        </div>
-
         {/* --- Strategy Section --- */}
         <div className="mb-6 md:mb-8 p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <h3 className="text-base md:text-lg font-bold mb-3 text-gray-800 flex items-center">
