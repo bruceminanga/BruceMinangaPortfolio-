@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 const TechLoading = () => {
   const [text, setText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
-  const fullText =
-    "BruceMinanga@Fedora> systemctl start portfolio.sh\n Loading modules...\n Optimizing performance...\n portfolio successfully started...";
+
+  const fullText = useMemo(
+    () =>
+      "BruceMinanga@Fedora> systemctl start portfolio.sh\n Loading modules...\n Optimizing performance...\n portfolio successfully started...",
+    []
+  );
 
   useEffect(() => {
     let index = 0;
+    let statusTimeout;
+
     const timer = setInterval(() => {
       if (index < fullText.length) {
         setText(fullText.slice(0, index + 1));
@@ -17,13 +23,18 @@ const TechLoading = () => {
         setIsComplete(true);
         clearInterval(timer);
         // Add delay before showing status bar to let user read the output
-        setTimeout(() => {
+        statusTimeout = setTimeout(() => {
           setShowStatus(true);
         }, 2000); // 2 second delay
       }
-    }, 80); // Slightly slower typing for better readability
+    }, 80);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      if (statusTimeout) {
+        clearTimeout(statusTimeout);
+      }
+    };
   }, [fullText]);
 
   return (
@@ -54,7 +65,7 @@ const TechLoading = () => {
               <div className="absolute top-0 -right-2 w-0 h-0 border-l-8 border-l-blue-600 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
             </div>
 
-            {/* Separator */}
+            {/* System segment */}
             <div className="relative ml-2">
               <div className="bg-green-600 text-white px-3 py-1 font-bold">
                 Fedora
@@ -68,7 +79,7 @@ const TechLoading = () => {
               <div className="absolute top-0 -right-2 w-0 h-0 border-l-8 border-l-purple-600 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
             </div>
 
-            {/* Git segment (optional) */}
+            {/* Git segment */}
             <div className="relative ml-2">
               <div className="bg-orange-600 text-white px-3 py-1 flex items-center">
                 <span className="mr-1">⎇</span>
@@ -85,7 +96,7 @@ const TechLoading = () => {
             <pre className="whitespace-pre-wrap leading-relaxed">{text}</pre>
             <span
               className={`inline-block w-2 h-5 ml-1 bg-green-400 ${
-                isComplete ? "opacity-100" : "animate-pulse"
+                !isComplete ? "animate-pulse" : ""
               }`}
             ></span>
           </div>
@@ -97,14 +108,14 @@ const TechLoading = () => {
                 <div className="bg-green-600 text-white px-3 py-1 text-xs font-bold">
                   ✓ SUCCESS
                 </div>
-                <div className="absolute top-0 -right-2 w-0 h-0 border-l-8 border-l-green-600 border-t-3 border-t-transparent border-b-3 border-b-transparent"></div>
+                <div className="absolute top-0 -right-2 w-0 h-0 border-l-8 border-l-green-600 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
               </div>
 
               <div className="relative ml-2">
                 <div className="bg-blue-600 text-white px-3 py-1 text-xs">
                   Portfolio Ready
                 </div>
-                <div className="absolute top-0 -right-2 w-0 h-0 border-l-8 border-l-blue-600 border-t-3 border-t-transparent border-b-3 border-b-transparent"></div>
+                <div className="absolute top-0 -right-2 w-0 h-0 border-l-8 border-l-blue-600 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
               </div>
 
               <div className="relative ml-2">
