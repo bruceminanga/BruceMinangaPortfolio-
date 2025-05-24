@@ -7,10 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+
+# Environment files
 *.local
+.env
+.env.production
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +30,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Package manager files
+package-lock.json  # Only if you're not using it consistently
+yarn.lock         # Only if you're using npm instead
+
+# Cache directories
+.cache/
+.vite/
+
+# Build artifacts that might be generated
+*.tsbuildinfo
