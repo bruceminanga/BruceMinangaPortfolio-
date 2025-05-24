@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useMemo } from "react";
 
-const TechLoading = () => {
+const TechLoading = ({ onComplete }) => {
   const [text, setText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
 
   const fullText = useMemo(
     () =>
-      "BruceMinanga@Fedora> systemctl start portfolio.sh\n Loading modules...\n Optimizing performance...\n portfolio successfully started...",
+      " Loading modules...\n Optimizing performance...\n portfolio successfully started...",
     []
   );
 
   useEffect(() => {
     let index = 0;
     let statusTimeout;
+    let completeTimeout;
 
     const timer = setInterval(() => {
       if (index < fullText.length) {
@@ -25,6 +26,12 @@ const TechLoading = () => {
         // Add delay before showing status bar to let user read the output
         statusTimeout = setTimeout(() => {
           setShowStatus(true);
+          // Give users time to read the completion status, then signal we're done
+          completeTimeout = setTimeout(() => {
+            if (onComplete) {
+              onComplete();
+            }
+          }, 2000); // 2 seconds to read the status
         }, 2000); // 2 second delay
       }
     }, 80);
@@ -34,8 +41,11 @@ const TechLoading = () => {
       if (statusTimeout) {
         clearTimeout(statusTimeout);
       }
+      if (completeTimeout) {
+        clearTimeout(completeTimeout);
+      }
     };
-  }, [fullText]);
+  }, [fullText, onComplete]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 p-4">
@@ -91,7 +101,15 @@ const TechLoading = () => {
             <span className="text-gray-300 ml-4"> {">"} </span>
           </div>
 
-          {/* Command output */}
+          {/* Command input line (static) */}
+          <div className="text-green-400 mb-2">
+            <span className="text-gray-300">BruceMinanga@Fedora</span>
+            <span className="text-gray-400"> ~ </span>
+            <span className="text-gray-300">{">"} </span>
+            <span className="text-blue-400">systemctl start portfolio.sh</span>
+          </div>
+
+          {/* Command output (animated) */}
           <div className="text-green-400">
             <pre className="whitespace-pre-wrap leading-relaxed">{text}</pre>
             <span

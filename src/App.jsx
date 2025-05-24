@@ -22,18 +22,13 @@ const CategoryPage = lazy(() => import("./components/MyServices/CategoryPage"));
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Simple loading timer - just show the loading animation for a set time
-    const loadingTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
 
-    return () => clearTimeout(loadingTimer);
-  }, []);
-
-  // Show TechLoading until timer completes
+  // Show TechLoading until it signals completion
   if (isLoading) {
-    return <TechLoading />;
+    return <TechLoading onComplete={handleLoadingComplete} />;
   }
 
   return (
