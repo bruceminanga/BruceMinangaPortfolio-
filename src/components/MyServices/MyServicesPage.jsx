@@ -321,7 +321,7 @@ I am selling each package of a successful philosophical concept (Intellectual pr
 
 🎒*Personal Insights & Updates (Did You Know):*🎒
 1️⃣ My portfolio is regularly updated with new projects and insights.
-2️⃣ Subscribing to BruceMinangas.world provides access to more detailed research and systems. (Consider clarity on what subscription entails).`,
+2️⃣ Subscribing to BruceMinangas.world provides access to more detailed research and systems.`,
       images: [researchImage],
     },
   ],
