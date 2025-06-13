@@ -154,7 +154,7 @@ const ProfileDetails = () => {
                 />
               </svg>
             </span>
-            My Philosophy
+            My Architect's Philosophy
           </h3>
           <p className="text-sm md:text-base text-gray-700 leading-relaxed">
             When I encounter a challenge or something isn't behaving as
