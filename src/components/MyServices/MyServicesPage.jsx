@@ -154,27 +154,6 @@ const BlogLink = ({ href, children }) => (
 export const MyServicesItems = {
   professional: [
     {
-      id: "logo-maker",
-      title: "Logo Maker",
-      description:
-        "Design unique logos for personal and business use to enhance brand recognition and professionalism.",
-      fullDescription:
-        "In September of 2023, I started to design logos for personal and business use. A professional logo is crucial for brand identity and can be used across various marketing materials like business cards, websites, and social media profiles. They significantly aid in brand recognition, convey professionalism, ensure consistency, and can even foster emotional connections with your audience.",
-      price: "KES 1,500.00",
-      images: [logoMakerImage],
-      referral: "Refer clients to me and get KES 500 per client after payment.",
-      // --- ADDED What's Included ---
-      whatsIncluded: [
-        "3 Initial Logo Concepts",
-        "Up to 5 Revision Rounds",
-        "High-Resolution Files (PNG, JPG, SVG)",
-        "Full Color & Black/White Versions",
-        "Basic Brand Style Guide (Color Palette & Fonts)",
-        "Full Ownership Rights",
-      ],
-      // --- END ---
-    },
-    {
       id: "tech-lead",
       title: "Tech Lead & Tech Sales Representative",
       description:
