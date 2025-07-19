@@ -311,9 +311,109 @@ const ProfileCard = () => {
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 mt-6 italic">
-          Dreams that keep me awake.
-        </p>
+        {/* Dreams that keep me awake - Interactive Element */}
+        <div className="relative inline-block mt-6">
+          <style jsx>{`
+            @keyframes gradientShift {
+              0%,
+              100% {
+                background-position: 0% 50%;
+              }
+              50% {
+                background-position: 100% 50%;
+              }
+            }
+
+            @keyframes pulse {
+              0% {
+                transform: scale(0.8);
+                opacity: 1;
+              }
+              100% {
+                transform: scale(2.4);
+                opacity: 0;
+              }
+            }
+
+            .dream-text {
+              background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+              background-size: 400% 400%;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              animation: gradientShift 8s ease-in-out infinite;
+              cursor: pointer;
+              transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .dream-text:hover {
+              transform: translateY(-2px);
+              text-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            }
+
+            @keyframes musicNote {
+              0%,
+              100% {
+                transform: translateY(0px) rotate(0deg);
+              }
+              25% {
+                transform: translateY(-3px) rotate(5deg);
+              }
+              75% {
+                transform: translateY(3px) rotate(-5deg);
+              }
+            }
+
+            .music-icon {
+              animation: musicNote 2s ease-in-out infinite;
+            }
+
+            .dream-container:hover .click-hint {
+              opacity: 1;
+            }
+
+            .pulse-ring {
+              animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+          `}</style>
+
+          <div className="flex items-center justify-center gap-3">
+            <svg
+              className="music-icon w-5 h-5 text-purple-400 opacity-70"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+
+            <p
+              className="dream-text text-sm font-light tracking-wide leading-relaxed"
+              onClick={() =>
+                window.open(
+                  "https://www.youtube.com/watch?v=6R_LUJ8LU4E",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+            >
+              Dreams that keep me awake.
+            </p>
+
+            <svg
+              className="music-icon w-4 h-4 text-purple-400 opacity-70"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+          </div>
+
+          <div className="click-hint absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 opacity-0 transition-opacity duration-300 pointer-events-none font-light">
+            🎵 click to play song 🎵
+          </div>
+
+          <div className="pulse-ring absolute border-2 border-purple-300 rounded-full opacity-30 pointer-events-none top-1/2 left-1/2 w-5 h-5 -mt-2.5 -ml-2.5"></div>
+        </div>
       </div>
 
       {/* Full Image Modal */}
