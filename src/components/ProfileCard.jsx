@@ -390,7 +390,7 @@ const ProfileCard = () => {
               className="dream-text text-sm font-light tracking-wide leading-relaxed"
               onClick={() =>
                 window.open(
-                  "https://www.youtube.com/watch?v=6R_LUJ8LU4E",
+                  "https://www.youtube.com/watch?v=dcCZ8ZS88NI",
                   "_blank",
                   "noopener,noreferrer"
                 )
