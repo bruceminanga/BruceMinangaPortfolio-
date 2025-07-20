@@ -645,8 +645,8 @@ const MyServicesPage = () => {
         </h2>
         <p className="max-w-xl">
           Hi! I'm Bruce, the IT guy & the owner of this digital realm. Exploring
-          technology, philosophy, and more. Let me bring your digital dreams to
-          life (He/him).
+          & contributing to technology, philosophy, and more. Let me bring your
+          digital dreams to life (He/him).
         </p>
       </div>
 
