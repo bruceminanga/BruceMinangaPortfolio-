@@ -198,8 +198,8 @@ const ProfileCard = () => {
       <div className="pt-16 pb-8 px-6 text-center">
         <h1 className="text-2xl font-bold text-gray-800">Bruce Minanga</h1>
         <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-          DevSecOps Engineer • Linux (Fedora) • Cloud • Automation (CI/CD,
-          Ansible) • Containers (Docker, Kubernetes)
+          DevSecOps Engineer • Building Secure, Scalable Infrastructure to
+          Accelerate AI & Machine Learning Innovation
         </p>
         <p
           className={`text-sm mt-2 font-medium ${
