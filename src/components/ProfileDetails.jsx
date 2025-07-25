@@ -123,12 +123,12 @@ const ProfileDetails = () => {
             My Strategy
           </h3>
           <p className="text-sm md:text-base text-gray-700 leading-relaxed">
-            My approach to learning new tools, both in and out of tech, centers
-            on grasping their fundamental principles and underlying patterns.
-            This focus ensures that as technologies evolve or new ones appear, I
-            can adapt quickly because the core concepts often remain consistent
-            or share common philosophies. Understanding one fundamental makes
-            learning the next much faster.
+            My approach to learning new tools(systems), both in and out of tech,
+            centers on grasping their fundamental principles and underlying
+            patterns. This focus ensures that as technologies evolve or new ones
+            appear, I can adapt quickly because the core concepts often remain
+            consistent or share common philosophies. Understanding one
+            fundamental makes learning the next much faster.
           </p>
           <blockquote className="mt-3 pl-4 border-l-4 border-purple-200 italic text-gray-600 text-sm md:text-base">
             It's the power of mastering transferable concepts.
