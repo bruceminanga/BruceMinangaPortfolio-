@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import myLogo from "../assets/images/My-logo.png";
-import backgroundVideo from "../assets/videos/fire.mp4";
+import coverImage from "../assets/images/cover.jpg";
 
 const ProfileCard = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +13,6 @@ const ProfileCard = () => {
   const shareButtonRef = useRef(null);
   const shareMenuRef = useRef(null);
   const messagePopupRef = useRef(null);
-  const videoRef = useRef(null);
   const navigate = useNavigate();
 
   const updateOpenStatus = useCallback(() => {
@@ -152,28 +151,15 @@ const ProfileCard = () => {
     setShowFullImage(false);
   };
 
-  const handleVideoError = () => {
-    console.warn("Video failed to load");
-    // You could set a fallback state here if needed
-  };
-
   return (
     <div className="max-w-md mx-auto bg-white rounded-lg overflow-hidden shadow-lg relative">
-      {/* Video Background Header */}
+      {/* Image Background Header */}
       <div className="relative h-48">
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
+        <img
+          src={coverImage}
+          alt="Cover background"
           className="absolute top-0 left-0 w-full h-full object-cover"
-          onError={handleVideoError}
-          aria-label="Background video"
-        >
-          <source src={backgroundVideo} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-500 opacity-50"></div>
 
         {/* Profile Image */}
