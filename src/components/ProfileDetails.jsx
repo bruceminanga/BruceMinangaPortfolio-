@@ -120,7 +120,7 @@ const ProfileDetails = () => {
                 />
               </svg>
             </span>
-            My Strategy
+            My Learning Strategy
           </h3>
           <p className="text-sm md:text-base text-gray-700 leading-relaxed">
             My approach to learning new tools(systems), both in and out of tech,
