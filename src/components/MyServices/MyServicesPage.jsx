@@ -12,7 +12,7 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import logoMakerImage from "../../assets/images/logomaker.jpg";
 import techLeadImage1 from "../../assets/images/tech-lead-1.jpg";
 import techLeadImage2 from "../../assets/images/tech-lead-2.jpg";
-import softwareEngineeringImage from "../../assets/images/software-engineering.jpg";
+import softwareEngineeringImage from "../../assets/images/software-engineering.png";
 import monstersImage from "../../assets/images/monsters.jpg";
 import philosophyImage from "../../assets/images/philosophy.jpg";
 import researchImage from "../../assets/images/research.jpg";
@@ -154,101 +154,40 @@ const BlogLink = ({ href, children }) => (
 export const MyServicesItems = {
   professional: [
     {
-      id: "tech-lead",
-      title: "Tech Lead & Tech Sales Representative",
+      id: "devsecops-engineering",
+      title: "DevSecOps Engineering",
       description:
-        "Selling quality tech products (laptops, storage) with basic desktop support included.",
-      fullDescription: `In September of 2023, I started to sell technology products/services to customers. I have the following gadgets for sell:
-💻💻💻💻💻💻Laptops 💻💻💻💻💻💻
-*1. Lenovo(Highly Recommend if you are a Techy coz its cross platform)*
-a) ThinkPad T Series:
-T490 i5 touch 8th gen 8ram 256ssd @30000
-T480 i5 touch 8th gen 8ram 256ssd 29000
-T480 i5 8th gen 8ram 256ssd @27000
-T470s i5 6th gen 8ram 256ssd @21500
-T460s i5 6th gen 8ram 256ssd @20500
-T450s i5 8ram 256ssd @19,499
-b) ThinkPad X Series
-X270 i5 7th gen 8ram 256ssd @20000
-X270 i5 6th gen 8ram 256ssd 19000
-X260 i5 6th gen i5 8ram 256ssd@17499
-c) Yoga Series (2-in-1 convertibles):
-Yoga 11e m3 7th gen 8ram 128ssd @14000
-Yoga 11e  4ram 128ssd @12500
-*2. HP*
-a) HP EliteBook Series
-Hp830 G5 i7 8th 8/256 touch @38k
-Hp830 G5 i5 8th 8/256 touch @34k
-Hp840 g5 i5 8th gen 8ram 256ssd @30k
-Hp830 G5 i5 8th 8/256 non touch 30k
-Hp840g3 i7 touch 8ram 256ssd @28k
-Hp840 g3 i5 8ram 256ssd @22500
-Hp840g2 i5 8ram 500hhd@17.5k
-⚠⚠⚠
-We stopped support and sales for the Dell, Asus,  Acer etc computers. Most of them have issues with our newer systems and makes it harder for us to troubleshoot issues. We believe simple is better than complex
-⚠⚠⚠
-🗄️🗄️🗄️🗄️🗄️Storage Devices🗄️🗄️🗄️🗄️🗄️
-1. Hard Disk: -500GB @2000
-2. SSD: -256GB @3000, -500GB @5500
-3. RAM: ddr3 8GB @2500
-📱📱📱📱📱Smartphones📱📱📱📱📱📱
-*1. Xiaomi*
- a) Redmi Note Series
-Redmi note 13 4GB ram, 128GB rom @25k
-*2. Samsung*
-🎧🎧🎧🎧🎧Earphones🎧🎧🎧🎧🎧🎧🎧
-Oraimo original @300
-Unlike other tech sellers, we offer free basic desktop support after you become our client. They include:
-1. Initial setup assistance ie connecting to internet, setting up user account, and basic configuration.
-2. Troubleshooting common issues ie installation errors, basic virus removal, and system performance optimization
-3. Basic usage guidance. Advice on how to use the operating system and pre-installed software effectively
-🔥Order now🔥`,
-      images: [techLeadImage1, techLeadImage2],
-      // No 'whatsIncluded' array here, so the section won't render for this item
-    },
-    {
-      id: "software-engineering",
-      title: "Software Engineering & IT Operations",
-      description:
-        "Web development, software installation/maintenance, and computer troubleshooting/repair.",
-      fullDescription: `In September of 2023, I started to provide the following services:
+        "Secure development practices, CI/CD pipeline automation, infrastructure security, and cloud operations with integrated security controls.",
+      fullDescription: `I provide comprehensive DevSecOps engineering services that bridge development, security, and operations:
 
-*Web Development Services:* I charge according to your website's complexity.
--Order now and get free access to my services @BruceMinangas.world
-*My achievements as a web developer*
-1. Designed 2 websites achieving 95% client satisfaction rate.
+*My DevSecOps Achievements:*
+1. Implemented secure CI/CD pipelines for 5+ projects with 99.2% uptime
 
-*IT Operations.* They include:
-1. Software Installations and maintenance.
--Latest Windows software (windows 10,11, office 2021,Antivirus)=ksh700 each
--Windows and office activation=ksh500 each
-2. Troubleshooting your computer.
--Fixing software issue=ksh500
--Computer repair=The price will vary based on the extent of damage to your device.
+*Core DevSecOps Services:*
+1. **Secure Development Pipeline Implementation**
+   - CI/CD pipeline setup with integrated security scanning 
+   - Automated vulnerability assessment integration
+   - Infrastructure as Code (IaC) security templates
+2. **Cloud Security Architecture**
+   - AWS/Azure/GCP security configuration 
+   - Container security (Docker/Kubernetes)
+   - Microservices security implementation 
 
-Unlike other local people who fix clients machines:
--I explain honestly whats wrong with clients machine and fix them permanently which in the long term saves clients money.`,
-      images: [softwareEngineeringImage],
-      // --- ADDED What's Included ---
+
+`,
+
+      images: [softwareEngineeringImage], // Replace with DevSecOps-specific image
+
       whatsIncluded: {
-        "Web Development (Example)": [
-          // Example of using objects for sub-sections
-          "Custom Website Design & Development",
-          "Responsive Design (Mobile, Tablet, Desktop)",
-          "Content Management System (Optional)",
-          "Basic SEO Optimization",
-          "Contact Form Integration",
-          "Deployment Assistance",
-        ],
-        "IT Operations": [
-          "Windows/Office Installation & Activation (as per listed prices)",
-          "Antivirus Installation (as per listed prices)",
-          "Software Troubleshooting (as per listed price)",
-          "Hardware Repair (Price varies)",
-          "Honest Diagnosis & Long-Term Fixes",
+        "DevSecOps Pipeline Services": [
+          "Secure CI/CD Pipeline Design & Implementation",
+          "Automated Security Testing Integration (SAST/DAST/SCA)",
+          "Infrastructure as Code (Terraform/CloudFormation) Security",
+          "Container Security & Orchestration (Docker/Kubernetes)",
+          "Git Security & Branch Protection Policies",
+          "Automated Compliance Checking & Reporting",
         ],
       },
-      // --- END ---
     },
   ],
   interests: [
