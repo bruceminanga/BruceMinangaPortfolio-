@@ -6,458 +6,394 @@ import React, {
   useMemo,
 } from "react";
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+const CFG = {
+  maxOverscroll: 900,
+  particleCount: 40,
+  nearBottomThreshold: 120,
+  conceptsStart: 0.15,
+};
+
+const CONCEPTS = [
+  { text: "Innovation",  color: "#38bdf8" },
+  { text: "Creativity",  color: "#a78bfa" },
+  { text: "Excellence",  color: "#34d399" },
+  { text: "Vision",      color: "#f472b6" },
+  { text: "Quality",     color: "#fb923c" },
+  { text: "Growth",      color: "#facc15" },
+  { text: "Passion",     color: "#f87171" },
+  { text: "Future",      color: "#22d3ee" },
+];
+
+// ─── Stable particle seed (created once) ─────────────────────────────────────
+const PARTICLES = Array.from({ length: CFG.particleCount }, (_, i) => ({
+  id: i,
+  size: Math.random() * 3 + 1.5,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  depth: Math.random() * 0.7 + 0.3,
+  hue: Math.floor(Math.random() * 60 + 200), // blue-violet range
+}));
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+function getScrollInfo() {
+  const wh = window.innerHeight;
+  const dh = document.documentElement.scrollHeight;
+  const st = window.pageYOffset;
+  const scrollable = dh - wh;
+  return {
+    scrollTop: st,
+    scrollable,
+    isAtBottom: scrollable > 0 && scrollable - st <= 5,
+    distFromBottom: Math.max(0, scrollable - st),
+  };
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 const AnimatedBackground = () => {
-  // State management
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [normalScrollPosition, setNormalScrollPosition] = useState(0);
-  const [isOverscrolling, setIsOverscrolling] = useState(false);
-  const [overscrollProgress, setOverscrollProgress] = useState(0);
-  const [isNearBottom, setIsNearBottom] = useState(false);
+  const [mouse, setMouse]           = useState({ x: 0.5, y: 0.5 }); // 0-1 normalized
+  const [scrollTop, setScrollTop]   = useState(0);
+  const [overscroll, setOverscroll] = useState(0);      // 0 → CFG.maxOverscroll
+  const [active, setActive]         = useState(false);  // overscroll mode
+  const [nearBottom, setNearBottom] = useState(false);
+  const [tick, setTick]             = useState(0);      // drives aurora shimmer
 
-  // Refs for cleanup and performance
-  const wheelTimeoutRef = useRef(null);
-  const animationFrameRef = useRef(null);
-  const resizeTimeoutRef = useRef(null);
+  const rafMouse  = useRef(null);
+  const rafTick   = useRef(null);
+  const wheelRef  = useRef(null);
 
-  // Configuration constants
-  const CONFIG = useMemo(
-    () => ({
-      maxOverscrollDepth: 800,
-      transitionDuration: 600,
-      nearBottomThreshold: 100,
-      conceptsStartShow: 0.2,
-      particleCount: 25,
-    }),
-    []
-  );
+  const progress = overscroll / CFG.maxOverscroll; // 0-1
 
-  // Concepts data
-  const concepts = useMemo(
-    () => [
-      { text: "Innovation", color: "#3b82f6", delay: 0 },
-      { text: "Creativity", color: "#8b5cf6", delay: 0.2 },
-      { text: "Excellence", color: "#6366f1", delay: 0.4 },
-      { text: "Vision", color: "#ec4899", delay: 0.6 },
-      { text: "Quality", color: "#14b8a6", delay: 0.8 },
-      { text: "Growth", color: "#f59e0b", delay: 1.0 },
-      { text: "Passion", color: "#ef4444", delay: 1.2 },
-      { text: "Future", color: "#10b981", delay: 1.4 },
-    ],
-    []
-  );
-
-  // Generate particles with memoization
-  const particles = useMemo(
-    () =>
-      Array.from({ length: CONFIG.particleCount }, (_, i) => ({
-        id: i,
-        size: Math.random() * 4 + 2,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        speedX: (Math.random() - 0.5) * 0.5,
-        speedY: (Math.random() - 0.5) * 0.3,
-        parallaxDepth: Math.random() * 0.8 + 0.2,
-      })),
-    [CONFIG.particleCount]
-  );
-
-  // Utility function to get scroll info
-  const getScrollInfo = useCallback(() => {
-    const windowHeight = window.innerHeight;
-    const docHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.pageYOffset;
-    const scrollableHeight = docHeight - windowHeight;
-
-    return {
-      windowHeight,
-      docHeight,
-      scrollTop,
-      scrollableHeight,
-      isAtBottom: scrollableHeight > 0 && scrollableHeight - scrollTop <= 5,
-      distanceFromBottom: Math.max(0, scrollableHeight - scrollTop),
-    };
-  }, []);
-
-  // Exit overscroll mode
-  const exitOverscroll = useCallback(() => {
-    setIsOverscrolling(false);
-    setOverscrollProgress(0);
-    document.body.style.overflow = "";
-
-    // Smooth scroll back to bottom
-    const { docHeight, windowHeight } = getScrollInfo();
-    window.scrollTo({
-      top: docHeight - windowHeight,
-      behavior: "smooth",
-    });
-  }, [getScrollInfo]);
-
-  // Check bottom proximity
-  const checkBottomProximity = useCallback(() => {
-    const scrollInfo = getScrollInfo();
-    const { scrollableHeight, distanceFromBottom } = scrollInfo;
-
-    if (scrollableHeight <= 0) {
-      setIsNearBottom(false);
-      return scrollInfo;
-    }
-
-    setIsNearBottom(
-      distanceFromBottom <= CONFIG.nearBottomThreshold && !isOverscrolling
-    );
-
-    return scrollInfo;
-  }, [isOverscrolling, CONFIG.nearBottomThreshold, getScrollInfo]);
-
-  // Throttled resize handler
-  const handleResize = useCallback(() => {
-    if (resizeTimeoutRef.current) {
-      clearTimeout(resizeTimeoutRef.current);
-    }
-    resizeTimeoutRef.current = setTimeout(checkBottomProximity, 100);
-  }, [checkBottomProximity]);
-
-  // Handle regular scroll
-  const handleScroll = useCallback(() => {
-    if (isOverscrolling) return;
-
-    const scrollTop = window.pageYOffset;
-    setNormalScrollPosition(scrollTop);
-    checkBottomProximity();
-  }, [isOverscrolling, checkBottomProximity]);
-
-  // Throttled mouse movement handler
-  const handleMouseMove = useCallback((e) => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-
-    animationFrameRef.current = requestAnimationFrame(() => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    });
-  }, []);
-
-  // Main wheel handler
-  const handleWheel = useCallback(
-    (e) => {
-      const scrollInfo = checkBottomProximity();
-      if (!scrollInfo) return;
-
-      const { isAtBottom } = scrollInfo;
-
-      // Clear existing timeout
-      if (wheelTimeoutRef.current) {
-        clearTimeout(wheelTimeoutRef.current);
-      }
-
-      // Enter overscroll mode
-      if (isAtBottom && e.deltaY > 0 && !isOverscrolling) {
-        e.preventDefault();
-
-        setIsOverscrolling(true);
-        setIsNearBottom(false);
-        document.body.style.overflow = "hidden";
-        setOverscrollProgress(
-          Math.min(CONFIG.maxOverscrollDepth, e.deltaY * 0.8)
-        );
-        return;
-      }
-
-      // Handle overscroll
-      if (isOverscrolling) {
-        e.preventDefault();
-
-        setOverscrollProgress((prev) => {
-          const newProgress = prev + e.deltaY * 0.6;
-
-          // Exit overscroll when scrolling back up
-          if (newProgress <= 0) {
-            wheelTimeoutRef.current = setTimeout(exitOverscroll, 50);
-            return 0;
-          }
-
-          return Math.min(CONFIG.maxOverscrollDepth, Math.max(0, newProgress));
-        });
-      }
-    },
-    [
-      isOverscrolling,
-      checkBottomProximity,
-      exitOverscroll,
-      CONFIG.maxOverscrollDepth,
-    ]
-  );
-
-  // Keyboard handler
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === "Escape" && isOverscrolling) {
-        exitOverscroll();
-      }
-    },
-    [isOverscrolling, exitOverscroll]
-  );
-
-  // Event listeners setup
+  // ── Aurora shimmer tick ──────────────────────────────────────────────────
   useEffect(() => {
-    const scrollHandler = { passive: true };
-    const wheelHandler = { passive: false };
-    const mouseMoveHandler = { passive: true };
-    const resizeHandler = { passive: true };
-
-    window.addEventListener("scroll", handleScroll, scrollHandler);
-    window.addEventListener("wheel", handleWheel, wheelHandler);
-    window.addEventListener("mousemove", handleMouseMove, mouseMoveHandler);
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("resize", handleResize, resizeHandler);
-
-    // Initial check
-    checkBottomProximity();
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("resize", handleResize);
-
-      // Cleanup
-      document.body.style.overflow = "";
-      [wheelTimeoutRef, animationFrameRef, resizeTimeoutRef].forEach((ref) => {
-        if (ref.current) {
-          ref.current.clearTimeout
-            ? clearTimeout(ref.current)
-            : cancelAnimationFrame(ref.current);
-        }
-      });
+    let t = 0;
+    const loop = () => {
+      t += 0.008;
+      setTick(t);
+      rafTick.current = requestAnimationFrame(loop);
     };
-  }, [
-    handleScroll,
-    handleWheel,
-    handleMouseMove,
-    handleKeyDown,
-    handleResize,
-    checkBottomProximity,
-  ]);
+    rafTick.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafTick.current);
+  }, []);
 
-  // Calculate animation values
-  const progressNormalized = overscrollProgress / CONFIG.maxOverscrollDepth;
-  const backgroundOpacity = isOverscrolling
-    ? Math.min(0.95, 0.3 + progressNormalized * 0.65)
-    : 0.05;
+  // ── Exit overscroll ──────────────────────────────────────────────────────
+  const exit = useCallback(() => {
+    setActive(false);
+    setOverscroll(0);
+    document.body.style.overflow = "";
+    const { scrollable } = getScrollInfo();
+    window.scrollTo({ top: scrollable, behavior: "smooth" });
+  }, []);
 
-  // Styles
-  const containerStyle = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    zIndex: isOverscrolling ? 999 : -1,
-    overflow: "hidden",
-    transition: `z-index 0s ${
-      isOverscrolling ? "0s" : `${CONFIG.transitionDuration}ms`
-    }`,
-    pointerEvents: isOverscrolling ? "auto" : "none",
-  };
+  // ── Wheel ────────────────────────────────────────────────────────────────
+  const handleWheel = useCallback((e) => {
+    const info = getScrollInfo();
+    if (wheelRef.current) clearTimeout(wheelRef.current);
 
-  const gradientStyle = {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background:
-      "radial-gradient(circle at center, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)",
-    opacity: backgroundOpacity,
-    transform: `scale(${1 + progressNormalized * 0.1})`,
-    transition: `opacity ${CONFIG.transitionDuration}ms ease, transform ${CONFIG.transitionDuration}ms ease`,
-  };
+    if (info.isAtBottom && e.deltaY > 0 && !active) {
+      e.preventDefault();
+      setActive(true);
+      setNearBottom(false);
+      document.body.style.overflow = "hidden";
+      setOverscroll(clamp(e.deltaY * 0.8, 0, CFG.maxOverscroll));
+      return;
+    }
 
-  const exitButtonStyle = {
-    position: "fixed",
-    bottom: "2rem",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-    color: "white",
-    border: "none",
-    padding: "12px 24px",
-    borderRadius: "50px",
-    fontSize: "1rem",
-    fontWeight: "600",
-    cursor: "pointer",
-    zIndex: 1000,
-    boxShadow: "0 8px 25px rgba(99, 102, 241, 0.4)",
-    opacity: Math.min(1, (progressNormalized - 0.1) * 2),
-    transition: "all 0.3s ease",
-  };
+    if (active) {
+      e.preventDefault();
+      setOverscroll((prev) => {
+        const next = prev + e.deltaY * 0.55;
+        if (next <= 0) {
+          wheelRef.current = setTimeout(exit, 40);
+          return 0;
+        }
+        return clamp(next, 0, CFG.maxOverscroll);
+      });
+    }
+  }, [active, exit]);
 
-  const indicatorStyle = {
-    position: "fixed",
-    bottom: "2rem",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "rgba(99, 102, 241, 0.9)",
-    backdropFilter: "blur(10px)",
-    color: "white",
-    padding: "10px 20px",
-    borderRadius: "30px",
-    fontSize: "0.9rem",
-    fontWeight: "500",
-    zIndex: 100,
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    boxShadow: "0 8px 25px rgba(99, 102, 241, 0.3)",
-    animation: "fadeInUp 0.4s ease",
-  };
+  // ── Scroll ───────────────────────────────────────────────────────────────
+  const handleScroll = useCallback(() => {
+    if (active) return;
+    const { scrollTop: st, distFromBottom } = getScrollInfo();
+    setScrollTop(st);
+    setNearBottom(distFromBottom <= CFG.nearBottomThreshold);
+  }, [active]);
+
+  // ── Mouse ────────────────────────────────────────────────────────────────
+  const handleMouse = useCallback((e) => {
+    cancelAnimationFrame(rafMouse.current);
+    rafMouse.current = requestAnimationFrame(() => {
+      setMouse({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+    });
+  }, []);
+
+  // ── Keyboard ─────────────────────────────────────────────────────────────
+  const handleKey = useCallback((e) => {
+    if (e.key === "Escape" && active) exit();
+  }, [active, exit]);
+
+  useEffect(() => {
+    window.addEventListener("scroll",    handleScroll, { passive: true });
+    window.addEventListener("wheel",     handleWheel,  { passive: false });
+    window.addEventListener("mousemove", handleMouse,  { passive: true });
+    window.addEventListener("keydown",   handleKey);
+    return () => {
+      window.removeEventListener("scroll",    handleScroll);
+      window.removeEventListener("wheel",     handleWheel);
+      window.removeEventListener("mousemove", handleMouse);
+      window.removeEventListener("keydown",   handleKey);
+      document.body.style.overflow = "";
+      cancelAnimationFrame(rafMouse.current);
+    };
+  }, [handleScroll, handleWheel, handleMouse, handleKey]);
+
+  // ── Aurora mesh gradient (tick-driven) ───────────────────────────────────
+  const aurora = useMemo(() => {
+    const t = tick;
+    const mx = mouse.x * 100;
+    const my = mouse.y * 100;
+    // 3 drifting blobs + mouse-reactive blob
+    return [
+      { cx: 20 + Math.sin(t * 0.7) * 15,  cy: 30 + Math.cos(t * 0.5) * 20,  color: "rgba(56,189,248,0.18)",  r: "55%" },
+      { cx: 75 + Math.cos(t * 0.6) * 12,  cy: 60 + Math.sin(t * 0.8) * 18,  color: "rgba(167,139,250,0.16)", r: "50%" },
+      { cx: 50 + Math.sin(t * 0.4) * 20,  cy: 80 + Math.cos(t * 0.3) * 10,  color: "rgba(52,211,153,0.12)",  r: "45%" },
+      { cx: mx,                            cy: my,                             color: "rgba(248,113,113,0.10)", r: "40%" },
+    ]
+      .map(b => `radial-gradient(ellipse ${b.r} at ${b.cx}% ${b.cy}%, ${b.color}, transparent 70%)`)
+      .join(", ");
+  }, [tick, mouse]);
+
+  // ── Derived values ────────────────────────────────────────────────────────
+  const bgOpacity    = active ? clamp(0.15 + progress * 0.82, 0, 0.97) : 0.04;
+  const vignette     = active ? `radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(0,0,6,${clamp(progress * 0.85, 0, 0.85)}) 100%)` : "none";
 
   return (
     <>
-      {/* Main background container */}
-      <div style={containerStyle}>
-        {/* Gradient Background */}
-        <div style={gradientStyle} />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap');
+
+        .ab-root {
+          position: fixed; inset: 0;
+          width: 100vw; height: 100vh;
+          overflow: hidden;
+          pointer-events: ${active ? "auto" : "none"};
+          z-index: ${active ? 999 : -1};
+        }
+
+        /* ── noise grain overlay ── */
+        .ab-root::after {
+          content: '';
+          position: absolute; inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+          background-size: 180px 180px;
+          opacity: .35;
+          pointer-events: none;
+          z-index: 10;
+          mix-blend-mode: overlay;
+        }
+
+        /* ── base void ── */
+        .ab-void {
+          position: absolute; inset: 0;
+          background: #02040a;
+          opacity: ${bgOpacity};
+          transition: opacity .5s ease;
+        }
+
+        /* ── aurora ── */
+        .ab-aurora {
+          position: absolute; inset: 0;
+          opacity: ${active ? clamp(progress * 1.3, 0, 0.9) : 0};
+          transition: opacity .6s ease;
+        }
+
+        /* ── vignette ── */
+        .ab-vignette {
+          position: absolute; inset: 0;
+          background: ${vignette};
+          pointer-events: none;
+          z-index: 5;
+        }
+
+        /* ── concept words ── */
+        .ab-concept {
+          position: absolute;
+          font-family: 'Syne', sans-serif;
+          font-weight: 800;
+          font-size: clamp(1.4rem, 3.5vw, 2.8rem);
+          white-space: nowrap;
+          user-select: none;
+          pointer-events: none;
+          letter-spacing: -0.02em;
+          filter: blur(0px);
+          text-shadow: 0 0 30px currentColor;
+          z-index: 6;
+        }
+
+        /* ── exit button ── */
+        .ab-exit {
+          position: fixed;
+          bottom: 2.5rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1001;
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 400;
+          font-size: .9rem;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,.9);
+          background: rgba(255,255,255,.06);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255,255,255,.12);
+          padding: 12px 32px;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: background .2s, border-color .2s, transform .2s;
+          opacity: ${clamp((progress - 0.08) * 3, 0, 1)};
+          box-shadow: 0 0 40px rgba(56,189,248,.15);
+        }
+        .ab-exit:hover {
+          background: rgba(255,255,255,.12);
+          border-color: rgba(255,255,255,.25);
+          transform: translateX(-50%) translateY(-2px);
+        }
+
+        /* ── near-bottom hint ── */
+        .ab-hint {
+          position: fixed;
+          bottom: 2rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 100;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: .82rem;
+          letter-spacing: .1em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,.7);
+          background: rgba(2,4,10,.55);
+          backdrop-filter: blur(14px);
+          border: 1px solid rgba(255,255,255,.08);
+          padding: 9px 22px;
+          border-radius: 999px;
+          animation: hintIn .4s cubic-bezier(.22,1,.36,1) both;
+        }
+        @keyframes hintIn {
+          from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ── scroll ring ── */
+        .ab-ring {
+          width: 18px; height: 18px;
+          border: 1.5px solid rgba(56,189,248,.6);
+          border-top-color: transparent;
+          border-radius: 50%;
+          animation: spin .9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
+
+      <div className="ab-root">
+        {/* Void base */}
+        <div className="ab-void" />
+
+        {/* Aurora mesh */}
+        <div
+          className="ab-aurora"
+          style={{ background: aurora }}
+        />
+
+        {/* Vignette */}
+        <div className="ab-vignette" />
 
         {/* Particles */}
-        {particles.map((particle) => {
-          const mouseInfluenceX =
-            (mousePosition.x / window.innerWidth - 0.5) * 50;
-          const mouseInfluenceY =
-            (mousePosition.y / window.innerHeight - 0.5) * 50;
-          const scrollInfluence = isOverscrolling
-            ? overscrollProgress * particle.parallaxDepth * 0.3
-            : normalScrollPosition * particle.parallaxDepth * 0.1;
-
-          const particleOpacity = isOverscrolling
-            ? Math.min(0.8, progressNormalized * 1.2)
-            : 0.05 +
-              (normalScrollPosition /
-                (document.documentElement.scrollHeight || 1)) *
-                0.1;
+        {PARTICLES.map((p) => {
+          const mx = (mouse.x - 0.5) * 60 * p.depth;
+          const my = (mouse.y - 0.5) * 60 * p.depth;
+          const sy = active
+            ? overscroll * p.depth * 0.25
+            : scrollTop * p.depth * 0.08;
+          const op = active
+            ? clamp(progress * 1.4, 0, 0.75)
+            : clamp(scrollTop / (document.documentElement.scrollHeight || 1) * 0.3, 0.02, 0.12);
 
           return (
             <div
-              key={particle.id}
+              key={p.id}
               style={{
                 position: "absolute",
-                left: `${particle.x}%`,
-                top: `${particle.y}%`,
-                width: `${particle.size}px`,
-                height: `${particle.size}px`,
-                background: "radial-gradient(circle, #6366f1 0%, #8b5cf6 100%)",
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
                 borderRadius: "50%",
-                opacity: particleOpacity,
-                transform: `translate(${
-                  mouseInfluenceX * particle.parallaxDepth
-                }px, ${
-                  mouseInfluenceY * particle.parallaxDepth - scrollInfluence
-                }px)`,
-                transition: "opacity 0.3s ease",
-                boxShadow: "0 0 10px rgba(99, 102, 241, 0.3)",
+                background: `hsl(${p.hue}, 80%, 70%)`,
+                opacity: op,
+                transform: `translate(${mx}px, ${my - sy}px)`,
+                transition: "opacity .4s ease",
+                boxShadow: `0 0 ${p.size * 3}px hsl(${p.hue}, 80%, 70%)`,
+                zIndex: 4,
+                willChange: "transform",
               }}
             />
           );
         })}
 
-        {/* Floating Concepts */}
-        {concepts.map((concept, idx) => {
-          const conceptProgress = Math.max(
-            0,
-            (progressNormalized -
-              CONFIG.conceptsStartShow -
-              concept.delay * 0.1) /
-              0.3
+        {/* Floating concept words */}
+        {active && CONCEPTS.map((c, i) => {
+          const localProgress = clamp(
+            (progress - CFG.conceptsStart - i * 0.06) / 0.28,
+            0, 1
           );
-          const opacity = Math.min(1, conceptProgress * 2);
-          const scale = 0.8 + Math.min(0.4, conceptProgress * 1.2);
-          const yOffset = (1 - conceptProgress) * 100;
+          if (localProgress <= 0) return null;
 
-          // Spiral pattern
-          const angle =
-            (idx / concepts.length) * Math.PI * 2 + overscrollProgress * 0.001;
-          const radius = 30 + Math.sin(overscrollProgress * 0.005) * 10;
-          const x = 50 + Math.cos(angle) * radius;
-          const y = 50 + Math.sin(angle) * radius * 0.6;
-
-          if (!isOverscrolling || opacity <= 0) return null;
+          const ease = 1 - Math.pow(1 - localProgress, 3);
+          const angle = (i / CONCEPTS.length) * Math.PI * 2 + overscroll * 0.0008;
+          const rx = 32 + Math.sin(tick * 0.4 + i) * 6;
+          const ry = 20 + Math.cos(tick * 0.3 + i) * 4;
+          const cx = 50 + Math.cos(angle) * rx;
+          const cy = 50 + Math.sin(angle) * ry;
 
           return (
             <div
-              key={concept.text}
+              key={c.text}
+              className="ab-concept"
               style={{
-                position: "absolute",
-                left: `${x}%`,
-                top: `${y}%`,
-                transform: `translate(-50%, -50%) scale(${scale}) translateY(${yOffset}px)`,
-                color: concept.color,
-                fontSize: "clamp(1.5rem, 4vw, 3rem)",
-                fontWeight: "700",
-                opacity: opacity,
-                textShadow: `0 0 20px ${concept.color}40`,
-                whiteSpace: "nowrap",
-                transition: "all 0.4s ease",
-                userSelect: "none",
+                left: `${cx}%`,
+                top: `${cy}%`,
+                color: c.color,
+                opacity: ease,
+                transform: `translate(-50%, -50%) scale(${0.7 + ease * 0.4}) translateY(${(1 - ease) * 40}px)`,
               }}
             >
-              {concept.text}
+              {c.text}
             </div>
           );
         })}
 
-        {/* Exit Button */}
-        {isOverscrolling && progressNormalized > 0.1 && (
-          <button
-            onClick={exitOverscroll}
-            style={exitButtonStyle}
-            onMouseEnter={(e) => {
-              e.target.style.transform = "translateX(-50%) translateY(-3px)";
-              e.target.style.boxShadow = "0 12px 35px rgba(99, 102, 241, 0.5)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = "translateX(-50%)";
-              e.target.style.boxShadow = "0 8px 25px rgba(99, 102, 241, 0.4)";
-            }}
-          >
-            ← Return to Content
+        {/* Exit */}
+        {active && (
+          <button className="ab-exit" onClick={exit}>
+            ← Return
           </button>
         )}
       </div>
 
-      {/* Bottom scroll indicator */}
-      {isNearBottom && !isOverscrolling && (
-        <div style={indicatorStyle}>
-          <span style={{ animation: "bounce 1.5s infinite" }}>↓</span>
+      {/* Near-bottom hint */}
+      {nearBottom && !active && (
+        <div className="ab-hint">
+          <div className="ab-ring" />
           <span>Keep scrolling to explore</span>
         </div>
       )}
-
-      {/* CSS Animations */}
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-          }
-        }
-
-        @keyframes bounce {
-          0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
-          }
-          40% {
-            transform: translateY(-8px);
-          }
-          60% {
-            transform: translateY(-4px);
-          }
-        }
-      `}</style>
     </>
   );
 };

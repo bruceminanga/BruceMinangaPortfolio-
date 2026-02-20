@@ -1,8 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { FaGithub, FaLinkedin, FaQuoteLeft } from "react-icons/fa";
-import { SiHackerrank } from "react-icons/si";
-import MovingEyes from "./MovingEyes";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Github, 
+  Linkedin, 
+  Quote, 
+  Code, 
+  Lightbulb, 
+  Target, 
+  Compass 
+} from "lucide-react";
 
+// --- INCLUDED MOVING EYES COMPONENT ---
+const MovingEyes = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      // Calculate mouse position relative to the center of the screen
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = (e.clientY / window.innerHeight) * 2 - 1;
+      setMousePos({ x, y });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  // Limit the eye movement radius
+  const eyeMovementX = mousePos.x * 4;
+  const eyeMovementY = mousePos.y * 4;
+
+  return (
+    <div className="flex space-x-2 items-center justify-center bg-gray-100 p-2 rounded-full shadow-inner">
+      {[1, 2].map((eye) => (
+        <div key={eye} className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow overflow-hidden relative">
+          <motion.div
+            className="w-2.5 h-2.5 bg-gray-800 rounded-full absolute"
+            animate={{ x: eyeMovementX, y: eyeMovementY }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// --- MAIN COMPONENT ---
 const ProfileDetails = () => {
   const testimonials = [
     {
@@ -34,284 +76,164 @@ const ProfileDetails = () => {
     },
   ];
 
-  // --- STATE HOOKS ---
-  const [hoveredTestimonial, setHoveredTestimonial] = useState(null);
-  const [isVisible, setIsVisible] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(() => {
-    return typeof window !== "undefined" ? window.innerWidth : 0;
-  });
+  const [isHovered, setIsHovered] = useState(false);
 
-  // --- EFFECT HOOKS ---
+  // Auto rotate testimonials
   useEffect(() => {
-    // Handles resizing and initial visibility animation
-    if (typeof window !== "undefined") {
-      const handleResize = () => setWindowWidth(window.innerWidth);
-      window.addEventListener("resize", handleResize);
-      setWindowWidth(window.innerWidth); // Set initial width
-      const timer = setTimeout(() => setIsVisible(true), 100);
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener("resize", handleResize);
-      };
-    }
-    return () => {}; // Cleanup for SSR/server case
-  }, []);
+    if (isHovered || testimonials.length === 0) return;
+    
+    const intervalId = setInterval(() => {
+      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 8000);
 
-  useEffect(() => {
-    // Auto rotate testimonials - testimonials is defined above
-    let intervalId = null;
-    if (hoveredTestimonial === null && testimonials.length > 0) {
-      intervalId = setInterval(() => {
-        setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-      }, 8000);
-    }
-    // Cleanup function clears interval if component unmounts or dependencies change
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
+    return () => clearInterval(intervalId);
+  }, [isHovered, testimonials.length]);
+
+  const getColorClasses = (color) => {
+    const classes = {
+      blue: { text: "text-blue-600", border: "border-blue-400", bg: "bg-blue-100", quote: "text-blue-200" },
+      purple: { text: "text-purple-600", border: "border-purple-400", bg: "bg-purple-100", quote: "text-purple-200" },
+      indigo: { text: "text-indigo-600", border: "border-indigo-400", bg: "bg-indigo-100", quote: "text-indigo-200" },
+      green: { text: "text-green-600", border: "border-green-400", bg: "bg-green-100", quote: "text-green-200" },
     };
-  }, [hoveredTestimonial, testimonials.length]); // Dependencies
-
-  // --- HELPER FUNCTION for Testimonial Colors ---
-  const getTextColorClass = (color) => {
-    switch (color) {
-      case "blue":
-        return "text-blue-600";
-      case "purple":
-        return "text-purple-600";
-      case "indigo":
-        return "text-indigo-600";
-      case "green":
-        return "text-green-600";
-      default:
-        return "text-gray-600"; // Fallback
-    }
+    return classes[color] || classes.blue;
   };
 
-  // --- RETURN JSX ---
   return (
-    // *** REMOVED overflow-hidden ***
-    <div
-      className={`rounded-xl shadow-2xl transition-all duration-700 ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      }`}
+    <motion.div 
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden"
     >
-      {/* Overall Padding */}
-      <div className="p-4 md:p-6">
+      <div className="p-6 md:p-8 space-y-8">
+        
         {/* --- Strategy Section --- */}
-        <div className="mb-6 md:mb-8 p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-          <h3 className="text-base md:text-lg font-bold mb-3 text-gray-800 flex items-center">
-            <span className="inline-block w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full mr-3 flex-shrink-0 shadow">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                {" "}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
+        <motion.div 
+          whileHover={{ y: -4 }}
+          className="p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+        >
+          <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800 flex items-center">
+            <span className="w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full mr-4 shadow-sm">
+              <Lightbulb className="w-5 h-5" />
             </span>
             My Learning Strategy
           </h3>
-          <p className="text-sm md:text-base text-gray-700 leading-relaxed">
-            My approach to learning new tools(systems), both in and out of tech,
-            centers on grasping their fundamental principles and underlying
-            patterns. This focus ensures that as technologies evolve or new ones
-            appear, I can adapt quickly because the core concepts often remain
-            consistent or share common philosophies. Understanding one
-            fundamental makes learning the next much faster.
+          <p className="text-gray-600 leading-relaxed">
+            My approach to learning new tools (systems), both in and out of tech, centers on grasping their fundamental principles and underlying patterns. This focus ensures that as technologies evolve or new ones appear, I can adapt quickly because the core concepts often remain consistent or share common philosophies. Understanding one fundamental makes learning the next much faster.
           </p>
-          <blockquote className="mt-3 pl-4 border-l-4 border-purple-200 italic text-gray-600 text-sm md:text-base">
+          <blockquote className="mt-4 pl-4 border-l-4 border-blue-200 italic text-gray-500">
             It's the power of mastering transferable concepts.
           </blockquote>
-        </div>
+        </motion.div>
 
         {/* --- Philosophy Section --- */}
-        <div className="mb-6 md:mb-8 p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-          <h3 className="text-base md:text-lg font-bold mb-3 text-gray-800 flex items-center">
-            <span className="inline-block w-8 h-8 flex items-center justify-center bg-purple-600 text-white rounded-full mr-3 flex-shrink-0 shadow">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                />
-              </svg>
+        <motion.div 
+          whileHover={{ y: -4 }}
+          className="p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+        >
+          <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800 flex items-center">
+            <span className="w-10 h-10 flex items-center justify-center bg-purple-600 text-white rounded-full mr-4 shadow-sm">
+              <Compass className="w-5 h-5" />
             </span>
             My Philosophy
           </h3>
-          <p className="text-sm md:text-base text-gray-700 leading-relaxed">
-            When I encounter a challenge or something isn't behaving as
-            expected, my first step is to identify the established principles I
-            might be overlooking or need to understand more deeply. If existing
-            concepts don't provide a clear path forward, I embrace the
-            opportunity to architect a novel solution. I'm continually refining
-            my problem-solving methods, actively seeking approaches that lead to
-            robust and automated outcomes.
+          <p className="text-gray-600 leading-relaxed">
+            When I encounter a challenge or something isn't behaving as expected, my first step is to identify the established principles I might be overlooking or need to understand more deeply. If existing concepts don't provide a clear path forward, I embrace the opportunity to architect a novel solution. I'm continually refining my problem-solving methods, actively seeking approaches that lead to robust and automated outcomes.
           </p>
-          <blockquote className="mt-3 pl-4 border-l-4 border-purple-200 italic text-gray-600 text-sm md:text-base">
-            Thank you for reading. This approach defines how I tackle
-            challenges. It's Who I Am.
+          <blockquote className="mt-4 pl-4 border-l-4 border-purple-200 italic text-gray-500">
+            Thank you for reading. This approach defines how I tackle challenges. It's Who I Am.
           </blockquote>
-        </div>
+        </motion.div>
 
         {/* --- Mission Section --- */}
-        <div className="mb-6 md:mb-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-blue-100">
-          <h3 className="text-base md:text-lg font-bold mb-3 text-gray-800 flex items-center">
-            <span className="inline-block w-8 h-8 flex items-center justify-center bg-indigo-600 text-white rounded-full mr-3 flex-shrink-0 shadow">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+        <motion.div 
+          whileHover={{ y: -4 }}
+          className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm border border-indigo-100"
+        >
+          <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800 flex items-center">
+            <span className="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-full mr-4 shadow-sm">
+              <Target className="w-5 h-5" />
             </span>
             My Mission, Vision & Motto
           </h3>
-          <div className="bg-white p-3 rounded-lg mb-3 shadow-inner">
-            <div className="text-gray-700 flex flex-wrap items-center justify-center text-center gap-2">
-              <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm">
+          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-inner">
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <span className="px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 🌟 使命 🌟 Make the world a better place
               </span>
-              <span className="inline-block px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs sm:text-sm">
+              <span className="px-3 py-1.5 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
                 🌟 想象 🌟 A model person who provides quality services
               </span>
-              <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs sm:text-sm">
-                🌟 座右铭 🌟 Applying Concepts{" "}
-                <span className="inline-block animate-spin text-[1em]">⚙️</span>{" "}
-                to solve problems + Moving On + Spread Joy
+              <span className="px-3 py-1.5 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium flex items-center gap-1">
+                🌟 座右铭 🌟 Applying Concepts <Code className="w-4 h-4 animate-pulse" /> to solve problems + Moving On + Spread Joy
               </span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* --- Testimonials Section --- */}
-        <div className="mb-6 md:mb-8 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100">
-          <h3 className="text-base md:text-lg font-bold mb-4 text-gray-800 flex items-center">
-            <span className="inline-block w-8 h-8 flex items-center justify-center bg-green-600 text-white rounded-full mr-3 flex-shrink-0 shadow">
-              <FaQuoteLeft className="w-4 h-4" />
+        <div className="p-6 bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg md:text-xl font-bold mb-6 text-gray-800 flex items-center">
+            <span className="w-10 h-10 flex items-center justify-center bg-green-600 text-white rounded-full mr-4 shadow-sm">
+              <Quote className="w-5 h-5" />
             </span>
             What People Say
           </h3>
-          {/* Container for rotating testimonials */}
-          <div
-            className="relative overflow-hidden"
-            style={{ minHeight: windowWidth < 640 ? "280px" : "220px" }}
+
+          <div 
+            className="relative min-h-[200px] flex items-center"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
-            {testimonials.map((testimonial, index) => {
-              // Determine color classes based on testimonial.color
-              let borderColorClass = "border-gray-400";
-              let quoteColorClass = "text-gray-400";
-              let badgeBgColorClass = "bg-gray-100 text-gray-700";
-
-              if (testimonial.color === "blue") {
-                borderColorClass = "border-blue-400";
-                quoteColorClass = "text-blue-400";
-                badgeBgColorClass = "bg-blue-100 text-blue-700";
-              } else if (testimonial.color === "purple") {
-                borderColorClass = "border-purple-400";
-                quoteColorClass = "text-purple-400";
-                badgeBgColorClass = "bg-purple-100 text-purple-700";
-              } else if (testimonial.color === "indigo") {
-                borderColorClass = "border-indigo-400";
-                quoteColorClass = "text-indigo-400";
-                badgeBgColorClass = "bg-indigo-100 text-indigo-700";
-              } else if (testimonial.color === "green") {
-                borderColorClass = "border-green-400";
-                quoteColorClass = "text-green-400";
-                badgeBgColorClass = "bg-green-100 text-green-700";
-              }
-
-              return (
-                <div
-                  key={index}
-                  className={`absolute w-full transform transition-all duration-500 cursor-pointer ${
-                    index === activeTestimonial
-                      ? "opacity-100 translate-x-0" // Active slide
-                      : index < activeTestimonial
-                      ? "opacity-0 -translate-x-full" // Slide out left
-                      : "opacity-0 translate-x-full" // Slide out right
-                  }`}
-                  onMouseEnter={() => setHoveredTestimonial(index)}
-                  onMouseLeave={() => setHoveredTestimonial(null)}
-                >
-                  {/* Individual Testimonial Card */}
-                  <div
-                    className={`bg-white p-3 sm:p-4 rounded-lg shadow-sm border-l-4 ${borderColorClass} transition-all duration-300 ${
-                      hoveredTestimonial === index
-                        ? "shadow-lg transform scale-[1.01]"
-                        : ""
-                    }`}
-                  >
-                    <div className="mb-3 flex items-start">
-                      <FaQuoteLeft
-                        className={`${quoteColorClass} text-opacity-30 text-3xl mr-2 mt-1 hidden sm:block`}
-                      />
-                      <p className="text-gray-700 leading-relaxed italic text-xs sm:text-sm">
-                        {testimonial.text}
-                      </p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                      <div className="mb-1 sm:mb-0">
-                        <p className="font-medium text-gray-800 text-sm sm:text-base">
-                          {testimonial.author}
-                        </p>
-                        {/* Use helper function for position/focus text color */}
-                        <p
-                          className={`${getTextColorClass(
-                            testimonial.color
-                          )} text-xs sm:text-sm`}
-                        >
-                          {testimonial.position || `On my ${testimonial.focus}`}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTestimonial}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                {(() => {
+                  const testimonial = testimonials[activeTestimonial];
+                  const colors = getColorClasses(testimonial.color);
+                  
+                  return (
+                    <div className={`bg-white p-5 md:p-6 rounded-xl shadow-sm border-l-4 ${colors.border}`}>
+                      <div className="flex items-start mb-4">
+                        <Quote className={`w-8 h-8 mr-3 flex-shrink-0 ${colors.quote} rotate-180`} />
+                        <p className="text-gray-600 leading-relaxed italic">
+                          "{testimonial.text}"
                         </p>
                       </div>
-                      {/* Pagination Badge */}
-                      <span
-                        className={`px-2 py-0.5 text-[10px] sm:text-xs rounded-full ${badgeBgColorClass} self-start sm:self-auto mt-1 sm:mt-0`}
-                      >
-                        {index + 1}/{testimonials.length}
-                      </span>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2">
+                        <div>
+                          <p className="font-semibold text-gray-900">{testimonial.author}</p>
+                          <p className={`text-sm font-medium ${colors.text}`}>
+                            {testimonial.position || `On my ${testimonial.focus}`}
+                          </p>
+                        </div>
+                        <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${colors.bg} ${colors.text}`}>
+                          {activeTestimonial + 1} / {testimonials.length}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })()}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Pagination Dots */}
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-6 gap-2">
             {testimonials.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setActiveTestimonial(index)}
-                className={`w-2.5 h-2.5 rounded-full mx-1.5 transition-all duration-300 ${
-                  index === activeTestimonial
-                    ? "bg-blue-600 scale-125"
-                    : "bg-gray-300 hover:bg-gray-400"
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  index === activeTestimonial ? "bg-blue-600 w-6" : "bg-gray-300 hover:bg-gray-400"
                 }`}
                 aria-label={`View testimonial ${index + 1}`}
               />
@@ -320,61 +242,53 @@ const ProfileDetails = () => {
         </div>
 
         {/* --- Social Links Section --- */}
-        <div className="mt-6 md:mt-8 text-center">
-          <h3 className="font-bold text-base md:text-lg mb-4 text-gray-800 flex items-center justify-center flex-wrap">
-            <span className="mr-2">Spy on me via </span>
-            <span className="inline-flex transform scale-75 md:scale-90">
-              <MovingEyes />
-            </span>
-          </h3>
-          <div className="flex justify-center space-x-3 sm:space-x-4 md:space-x-6 mt-3">
-            {/* LinkedIn */}
-            <a
-              href="https://www.linkedin.com/in/bruce-minanga-768a55240/"
-              target="_blank"
+        <div className="pt-4 text-center">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <h3 className="font-bold text-gray-800">Spy on me via</h3>
+            <MovingEyes />
+          </div>
+          
+          <div className="flex justify-center gap-6">
+            <a 
+              href="https://www.linkedin.com/in/bruce-minanga-768a55240/" 
+              target="_blank" 
               rel="noopener noreferrer"
-              className="transform transition-transform hover:scale-110 group flex flex-col items-center"
+              className="group flex flex-col items-center gap-2"
             >
-              <div className="bg-white p-2 sm:p-3 rounded-full shadow-md group-hover:shadow-lg group-hover:bg-blue-50 transition-all duration-300">
-                <FaLinkedin className="text-xl sm:text-2xl md:text-3xl text-blue-600" />
+              <div className="p-3 bg-white rounded-full shadow-sm border border-gray-100 group-hover:shadow-md group-hover:border-blue-200 group-hover:bg-blue-50 transition-all duration-300">
+                <Linkedin className="w-6 h-6 text-blue-600" />
               </div>
-              <span className="block mt-1 text-[10px] sm:text-xs md:text-sm text-gray-600 group-hover:text-blue-600 transition-colors duration-300">
-                LinkedIn
-              </span>
+              <span className="text-sm font-medium text-gray-500 group-hover:text-blue-600 transition-colors">LinkedIn</span>
             </a>
-            {/* GitHub */}
-            <a
-              href="https://github.com/bruceminanga"
-              target="_blank"
+
+            <a 
+              href="https://github.com/bruceminanga" 
+              target="_blank" 
               rel="noopener noreferrer"
-              className="transform transition-transform hover:scale-110 group flex flex-col items-center"
+              className="group flex flex-col items-center gap-2"
             >
-              <div className="bg-white p-2 sm:p-3 rounded-full shadow-md group-hover:shadow-lg group-hover:bg-gray-100 transition-all duration-300">
-                <FaGithub className="text-xl sm:text-2xl md:text-3xl text-gray-800" />
+              <div className="p-3 bg-white rounded-full shadow-sm border border-gray-100 group-hover:shadow-md group-hover:border-gray-300 group-hover:bg-gray-50 transition-all duration-300">
+                <Github className="w-6 h-6 text-gray-800" />
               </div>
-              <span className="block mt-1 text-[10px] sm:text-xs md:text-sm text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
-                GitHub
-              </span>
+              <span className="text-sm font-medium text-gray-500 group-hover:text-gray-800 transition-colors">GitHub</span>
             </a>
-            {/* HackerRank */}
-            <a
-              href="https://www.hackerrank.com/profile/bruceminanga"
-              target="_blank"
+
+            <a 
+              href="https://www.hackerrank.com/profile/bruceminanga" 
+              target="_blank" 
               rel="noopener noreferrer"
-              className="transform transition-transform hover:scale-110 group flex flex-col items-center"
+              className="group flex flex-col items-center gap-2"
             >
-              <div className="bg-white p-2 sm:p-3 rounded-full shadow-md group-hover:shadow-lg group-hover:bg-green-50 transition-all duration-300">
-                <SiHackerrank className="text-xl sm:text-2xl md:text-3xl text-green-600" />
+              <div className="p-3 bg-white rounded-full shadow-sm border border-gray-100 group-hover:shadow-md group-hover:border-green-200 group-hover:bg-green-50 transition-all duration-300">
+                <Code className="w-6 h-6 text-green-600" />
               </div>
-              <span className="block mt-1 text-[10px] sm:text-xs md:text-sm text-gray-600 group-hover:text-green-600 transition-colors duration-300">
-                HackerRank
-              </span>
+              <span className="text-sm font-medium text-gray-500 group-hover:text-green-600 transition-colors">HackerRank</span>
             </a>
           </div>
         </div>
-      </div>{" "}
-      {/* End of overall padding div */}
-    </div> // End of component root div
+
+      </div>
+    </motion.div>
   );
 };
 

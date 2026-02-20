@@ -1,163 +1,388 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import {
-  BrowserRouter as Router, // Note: Using HashRouter in App.jsx, keep consistent if needed elsewhere
-  Route,
-  Link,
-  Routes,
-  useParams,
-} from "react-router-dom";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { ChevronLeft, ChevronRight, BookOpen, BookMarked, Tag, Gift } from "lucide-react";
 
-// Note: Replace these with your actual image imports
-import logoMakerImage from "../../assets/images/logomaker.jpg";
-import techLeadImage1 from "../../assets/images/tech-lead-1.jpg";
-import techLeadImage2 from "../../assets/images/tech-lead-2.jpg";
+// ── Image imports ─────────────────────────────────────────────────────────────
+import logoMakerImage        from "../../assets/images/logomaker.jpg";
+import techLeadImage1        from "../../assets/images/tech-lead-1.jpg";
+import techLeadImage2        from "../../assets/images/tech-lead-2.jpg";
 import softwareEngineeringImage from "../../assets/images/software-engineering.png";
-import monstersImage from "../../assets/images/monsters.jpg";
-import philosophyImage from "../../assets/images/philosophy.jpg";
-import researchImage from "../../assets/images/research.jpg";
-import swimmingImage from "../../assets/images/swimming.jpg";
-import teachingImage from "../../assets/images/teaching.jpg";
-import familyTimeImage from "../../assets/images/family-time.jpg";
-import blogging1 from "../../assets/images/blogging1.jpg";
-import blogging2 from "../../assets/images/blogging2.jpg";
-import blogging3 from "../../assets/images/blogging3.jpg";
-import myLogo from "../../assets/images/My-logo.png";
+import monstersImage         from "../../assets/images/monsters.jpg";
+import philosophyImage       from "../../assets/images/philosophy.jpg";
+import researchImage         from "../../assets/images/research.jpg";
+import swimmingImage         from "../../assets/images/swimming.jpg";
+import teachingImage         from "../../assets/images/teaching.jpg";
+import familyTimeImage       from "../../assets/images/family-time.jpg";
+import blogging1             from "../../assets/images/blogging1.jpg";
+import blogging2             from "../../assets/images/blogging2.jpg";
+import blogging3             from "../../assets/images/blogging3.jpg";
+import myLogo                from "../../assets/images/My-logo.png";
 
-// ImageCarousel Component (Fixed - was missing)
-const ImageCarousel = ({ images }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+// ── Shared styles ─────────────────────────────────────────────────────────────
+const GLOBAL_STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,700;9..144,800&family=DM+Sans:wght@300;400;500&display=swap');
 
-  if (!images || images.length === 0) {
-    return (
-      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-        No images
-      </div>
-    );
+  :root {
+    --bg:       #f4f1ec;
+    --surface:  #ffffff;
+    --border:   rgba(0,0,0,.07);
+    --text-1:   #111010;
+    --text-2:   #6b6560;
+    --accent:   #c8502a;
+    --accent-bg:#fdf0eb;
+    --teal:     #0d9488;
+    --teal-bg:  #f0fdfa;
+    --radius:   14px;
+    --sh-sm:    0 1px 3px rgba(0,0,0,.05), 0 4px 14px rgba(0,0,0,.05);
+    --sh-md:    0 8px 30px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.06);
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); }
+
+  /* ── shared card ── */
+  .ms-card {
+    display: grid;
+    grid-template-columns: 76px 1fr 24px;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--sh-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s, border-color .2s;
+  }
+  .ms-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sh-md);
+    border-color: rgba(0,0,0,.12);
+  }
+  .ms-card:active { transform: none; }
+
+  .ms-thumb {
+    width: 76px; height: 76px;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+    background: var(--bg);
+  }
+  .ms-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: .98rem;
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: -.01em;
+    line-height: 1.3;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ms-card-snippet {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .78rem;
+    color: var(--text-2);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .ms-price-pill {
+    display: inline-block;
+    margin-top: 5px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+  .ms-chevron {
+    color: var(--text-2);
+    opacity: .35;
+    transition: opacity .2s, transform .2s;
+    flex-shrink: 0;
+  }
+  .ms-card:hover .ms-chevron { opacity: .8; transform: translateX(2px); }
+
+  /* ── topbar ── */
+  .ms-topbar {
+    position: sticky; top: 0; z-index: 40;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px;
+    background: rgba(244,241,236,.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .ms-back-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--sh-sm);
+    color: var(--text-1);
+    text-decoration: none;
+    transition: box-shadow .2s, transform .15s;
+  }
+  .ms-back-btn:hover { box-shadow: var(--sh-md); transform: translateX(-2px); }
+  .ms-topbar-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: -.02em;
   }
 
-  if (images.length === 1) {
-    return (
-      <img
-        src={images[0]}
-        alt="Service"
-        className="w-full h-full object-cover"
-        onError={(e) => {
-          e.target.src =
-            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23ddd"/><text x="50" y="50" text-anchor="middle" dy=".3em">No Image</text></svg>';
-        }}
-      />
-    );
+  /* ── hero banner ── */
+  .ms-hero {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    min-height: 200px;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px 24px;
+    margin-bottom: 36px;
+  }
+  .ms-hero-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .ms-hero-scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.75) 0%, rgba(0,0,0,.3) 60%, transparent 100%);
+  }
+  .ms-hero-content { position: relative; z-index: 2; color: #fff; }
+  .ms-hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .ms-hero-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 300;
+    color: rgba(255,255,255,.8);
+    line-height: 1.6;
+    max-width: 440px;
   }
 
-  const nextImage = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
+  /* ── section heading ── */
+  .ms-section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .ms-section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -.02em;
+  }
+  .ms-section-count {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .72rem;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
 
-  const prevImage = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
+  /* ── divider ── */
+  .ms-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
 
-  return (
-    <div className="relative w-full h-full">
-      <img
-        src={images[currentIndex]}
-        alt={`Service ${currentIndex + 1}`}
-        className="w-full h-full object-cover"
-        onError={(e) => {
-          e.target.src =
-            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23ddd"/><text x="50" y="50" text-anchor="middle" dy=".3em">No Image</text></svg>';
-        }}
-      />
+  /* ════════════════════════════════════
+     DETAIL VIEW
+  ════════════════════════════════════ */
+  .dv-root {
+    max-width: 680px;
+    margin: 0 auto;
+    font-family: 'DM Sans', sans-serif;
+  }
 
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={prevImage}
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+  /* sticky image */
+  .dv-image-wrap {
+    position: sticky; top: 0; z-index: 0;
+    overflow: hidden;
+    transition: height .12s linear, opacity .12s linear;
+  }
+  .dv-image-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-          <button
-            onClick={nextImage}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+  /* content card */
+  .dv-body {
+    position: relative; z-index: 1;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    margin-top: -20px;
+    padding: 28px 24px 32px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.08);
+  }
 
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex ? "bg-white" : "bg-white bg-opacity-50"
-                }`}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
+  .dv-pill-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .dv-cat-pill {
+    font-size: .7rem; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .dv-price-pill {
+    font-size: .72rem; font-weight: 500;
+    color: var(--accent); background: var(--accent-bg);
+    padding: 3px 10px; border-radius: 999px;
+    display: flex; align-items: center; gap: 4px;
+  }
 
-// Helper to format description with bold text
+  .dv-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.3rem, 4vw, 1.75rem);
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -.025em;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .dv-desc {
+    font-size: .88rem; line-height: 1.75;
+    color: var(--text-2);
+    white-space: pre-line;
+  }
+  .dv-desc strong { color: var(--text-1); font-weight: 600; }
+  .dv-desc a { color: var(--accent); text-decoration: underline; }
+
+  .dv-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 12px;
+    font-size: .8rem; font-weight: 500;
+    color: var(--accent); background: var(--accent-bg);
+    border: none; padding: 6px 14px; border-radius: 999px;
+    cursor: pointer; transition: opacity .15s;
+  }
+  .dv-toggle:hover { opacity: .78; }
+
+  /* Whats included */
+  .dv-included {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .dv-included-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem; font-weight: 700;
+    color: var(--text-1); letter-spacing: -.01em;
+    margin-bottom: 14px;
+  }
+  .dv-included-group { margin-bottom: 16px; }
+  .dv-included-group-head {
+    font-size: .75rem; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-2);
+    margin-bottom: 8px;
+  }
+  .dv-included-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: .82rem; color: var(--text-2);
+    line-height: 1.5; margin-bottom: 6px;
+  }
+  .dv-included-dot {
+    width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    flex-shrink: 0; margin-top: 6px;
+  }
+
+  /* referral */
+  .dv-referral {
+    margin-top: 20px;
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--teal-bg); border: 1px solid rgba(13,148,136,.2);
+    border-radius: 10px; padding: 12px 14px;
+    font-size: .82rem; color: var(--teal);
+  }
+
+  /* bottom bar */
+  .dv-footer {
+    position: sticky; bottom: 0; z-index: 20;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex; justify-content: flex-start;
+  }
+  .dv-back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem; font-weight: 500;
+    color: var(--text-1);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 9px 18px; border-radius: 999px;
+    text-decoration: none;
+    box-shadow: var(--sh-sm);
+    transition: box-shadow .2s, background .15s;
+  }
+  .dv-back-link:hover { box-shadow: var(--sh-md); background: var(--bg); }
+
+  /* not-found */
+  .dv-notfound {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 60vh;
+    gap: 12px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-2); text-align: center;
+  }
+  .dv-notfound h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem; font-weight: 700;
+    color: var(--text-1);
+  }
+`;
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const BlogLink = ({ href, children }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+);
+
 const formatDescription = (text) => {
-  if (typeof text !== "string") {
-    console.warn("formatDescription received non-string input:", text);
-    return text;
-  }
-
-  // Split by markdown links first
+  if (typeof text !== "string") return text;
   const parts = text.split(/(\[.*?\]\(.*?\))/g);
-
-  return parts.map((part, index) => {
-    // Check if this part is a markdown link
-    const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
-    if (linkMatch) {
-      const [_, linkText, linkUrl] = linkMatch;
-      return (
-        <BlogLink key={index} href={linkUrl}>
-          {linkText}
-        </BlogLink>
-      );
-    }
-
-    // Handle bold text with asterisks
-    return part
-      .split("*")
-      .map((subPart, subIndex) =>
-        subIndex % 2 === 0 ? (
-          subPart
-        ) : (
-          <strong key={`${index}-${subIndex}`}>{subPart}</strong>
-        )
-      );
+  return parts.map((part, i) => {
+    const m = part.match(/\[(.*?)\]\((.*?)\)/);
+    if (m) return <BlogLink key={i} href={m[2]}>{m[1]}</BlogLink>;
+    return part.split("*").map((sub, j) =>
+      j % 2 === 0 ? sub : <strong key={`${i}-${j}`}>{sub}</strong>
+    );
   });
 };
 
-// Reusable Blog Link component
-const BlogLink = ({ href, children }) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-blue-600 hover:text-blue-800 hover:underline inline"
-  >
-    {children}
-  </a>
-);
-
-// --- DATA STRUCTURE ---
+// ── Data ──────────────────────────────────────────────────────────────────────
 export const MyServicesItems = {
   professional: [
     {
       id: "devsecops-engineering",
       title: "DevSecOps Engineering",
-      description:
-        "Secure development practices, CI/CD pipeline automation, infrastructure security, and cloud operations with integrated security controls.",
+      description: "Secure development practices, CI/CD pipeline automation, infrastructure security, and cloud operations with integrated security controls.",
       fullDescription: `I provide comprehensive DevSecOps engineering services that bridge development, security, and operations:
 
 *My DevSecOps Achievements:*
@@ -171,13 +396,8 @@ export const MyServicesItems = {
 2. **Cloud Security Architecture**
    - AWS/Azure/GCP security configuration 
    - Container security (Docker/Kubernetes)
-   - Microservices security implementation 
-
-
-`,
-
-      images: [softwareEngineeringImage], // Replace with DevSecOps-specific image
-
+   - Microservices security implementation`,
+      images: [softwareEngineeringImage],
       whatsIncluded: {
         "DevSecOps Pipeline Services": [
           "Secure CI/CD Pipeline Design & Implementation",
@@ -194,10 +414,9 @@ export const MyServicesItems = {
     {
       id: "philosophy",
       title: "Philosophy, Philanthropy And History",
-      description:
-        "Exploring philosophical concepts, philanthropy, and historical context.",
-      fullDescription: `In September of 2023, I started to learn relevant  philosophical concepts which helps in rewiring my brain to get me out of inappropriate social constructs, logical fallacies & embracing conspiracy theories created by some corporates & our ancestors.
-- Learning philosophy of psychology makes my life better & learning history makes me know where i came from & predict where I'm heading to.
+      description: "Exploring philosophical concepts, philanthropy, and historical context.",
+      fullDescription: `In September of 2023, I started to learn relevant philosophical concepts which helps in rewiring my brain to get me out of inappropriate social constructs, logical fallacies & embracing conspiracy theories created by some corporates & our ancestors.
+
 *Key Findings:*
 1. Philosophers can be wrong; they present to you their thoughts 🤷🏽‍♂️ 
 2. It's easier to understand people's thoughts when you are a philosopher.
@@ -207,37 +426,28 @@ export const MyServicesItems = {
 1. Solipsism: You & only you exist, therefore Compete with yourself, not others. 
 2. Empiricism: The source of human knowledge is experience.
 3. Rationalism: Reason & logic are the primary sources of knowledge & truth.
+
 *My best philosophy of ethics concepts*
 1. Resilience & Stoicism. Ability to endure Destructions
-*My best philosophy of Decison theory/Strategic Interaction concepts*
-1. The game theory. Life is a challenging fun game, Learn how to play it.(Jumanji)
-*My best philosophy of psychology concepts:*
-1. Halo effect. One good aspect of a product/person making people create a general opinion
-2. Habituation. Decrease in response to repetitive stimuli
-*Psychological concepts I can't entirely agree fully with:*
-1. Synchronicity. Coincidences
-
-*Fun history:*
-1. Revolutions eg Agrarian revolutions, political revolutions, Cultural/social revolution, Sexual revolution etc
-*Horror history*
-1. Dark ages. A period between 5th-15th century.
 
 I am selling each package of a successful philosophical concept (Intellectual property) at ksh500`,
       images: [philosophyImage],
+      price: "KES 500 / concept",
     },
     {
       id: "research",
-      title: "Research & Did You Know Phrase",
-      description:
-        "Focusing on life pattern analysis (Life Framework) and technological research.",
+      title: "Research & Did You Know",
+      description: "Focusing on life pattern analysis (Life Framework) and technological research.",
       fullDescription: `Actively engaged in research since September 2023:
+
 1️⃣ *Life Pattern Analysis:* Developing the "Life Framework" project focusing on pattern recognition, utilization, and creation across key areas:
-    -| Health and Awareness
-    -| Relationships & Pleasures
-    -| Work & Contribution To Society
+    - Health and Awareness
+    - Relationships & Pleasures
+    - Work & Contribution To Society
+
 2️⃣ *Technological Research:* Exploring advancements and trends in technology.
 
-🎒*Personal Insights & Updates (Did You Know):*🎒
+🎒 *Personal Insights & Updates (Did You Know):* 🎒
 1️⃣ My portfolio is regularly updated with new projects and insights.
 2️⃣ Subscribing to BruceMinangas.world provides access to more detailed research and systems.`,
       images: [researchImage],
@@ -253,364 +463,271 @@ I am selling each package of a successful philosophical concept (Intellectual pr
     },
     {
       id: "teaching",
-      title: "Teaching & Public speaking",
+      title: "Teaching & Public Speaking",
       description: "Sharing knowledge in programming and technology.",
-      fullDescription: `I love to spread the knowledge i gained throughout my work to the world. I do teach the following:
+      fullDescription: `I love to spread the knowledge i gained throughout my work to the world. I teach:
+
 1. Programming & Tech with some Philosophical Concepts
-2. Mindset Education. Mindset is like a way of thinking. It's what you believe about yourself and what you can do.
+2. Mindset Education
 
 *Types of mindset*
-1. Fixed mindset. It's when you believe you can't get better at something, no matter how hard you try
-2. Growth mindset. It's when you believe you can get better at something if you keep trying and practising. Those who cannot change their minds, cannot change anything
-3. False growth mindset. Having surface level belief in improvement without engaging in the actual behaviour that lead to growth 
-
-*Applying mindset principles*
-1. At work. Encourage innovation & learning from mistakes 
-2. In relationship. Build stronger connections and resolve conflicts
-3. Health and wellness. Adopt and maintain healthy habits
-
-I teach in form of blogging & story telling
+1. Fixed mindset. It's when you believe you can't get better at something
+2. Growth mindset. It's when you believe you can get better at something if you keep trying
+3. False growth mindset. Surface level belief in improvement without engaging in actual behaviour
 
 *Featured Blogs:*
-[1. Saying Techy Words Doesn't Make Us Techy](https://www.linkedin.com/pulse/saying-techy-words-doesnt-make-us-bruce-minanga-zsj5f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D)
-[2. Understanding Computer Programming Languages (Series)](https://www.linkedin.com/pulse/understanding-computer-programming-languages-bruce-minanga-sy47f/?trackingId=sjjykjZUQKSivOPF0VKurg%3D%3D)
-[3. Linux Philosophy (Series)](https://www.linkedin.com/pulse/linux-philosophy-bruce-minanga-dqevf/)
+[1. Saying Techy Words Doesn't Make Us Techy](https://www.linkedin.com/pulse/saying-techy-words-doesnt-make-us-bruce-minanga-zsj5f/)
+[2. Understanding Computer Programming Languages](https://www.linkedin.com/pulse/understanding-computer-programming-languages-bruce-minanga-sy47f/)
+[3. Linux Philosophy](https://www.linkedin.com/pulse/linux-philosophy-bruce-minanga-dqevf/)
 [4. The Game Theory](https://www.linkedin.com/pulse/game-theory-bruce-minanga-73anf/)
 
-*My Stories include:*
-1. My tech journey
-
-You can also Hire me as a public speaker to talk about my projects`,
+You can also hire me as a public speaker to talk about my projects.`,
       images: [teachingImage],
-      price: "KES 100/hr (Teaching), KES 3000/hr (Speaking)",
+      price: "KES 100/hr (Teaching) · KES 3,000/hr (Speaking)",
     },
     {
       id: "family-time",
       title: "Spending Time With Family & Friends",
       description: "Appreciating the support system.",
-      fullDescription: `Deeply grateful to my family (especially Mom and Dad) and friends for their unwavering support and care throughout my endeavors. Meaningful relationships are fundamental. Peace ✌️
-
-Consider subscribing @BruceMinangas.world for insights on building support systems. (Clarify subscription benefits).`,
+      fullDescription: `Deeply grateful to my family (especially Mom and Dad) and friends for their unwavering support and care throughout my endeavors. Meaningful relationships are fundamental. Peace ✌️`,
       images: [familyTimeImage],
     },
   ],
 };
 
-// --- ITEM DETAIL VIEW COMPONENT (Already exported via 'export const') ---
-export const ItemDetailView = () => {
-  const { category, id } = useParams();
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const detailViewRef = useRef(null);
-
-  // Find the item safely
-  const categoryItems = MyServicesItems[category] || [];
-  const selectedItem = categoryItems.find((item) => item.id === id);
-
-  const toggleDescription = useCallback(() => {
-    setShowFullDescription((prev) => !prev);
-  }, []);
-
-  // Handle scrolling for effects
-  useEffect(() => {
-    const handleScroll = () => {
-      if (detailViewRef.current) {
-        setScrollPosition(detailViewRef.current.scrollTop);
-      }
-    };
-    const detailView = detailViewRef.current;
-    if (detailView) {
-      detailView.addEventListener("scroll", handleScroll);
-      return () => detailView.removeEventListener("scroll", handleScroll);
-    }
-  }, []);
-
-  // Handle item not found
-  if (!selectedItem) {
-    return (
-      <div className="text-center p-10">
-        <h2 className="text-xl font-semibold text-red-600">Item not found</h2>
-        <Link
-          to="/MyServices"
-          className="text-blue-500 hover:underline mt-4 inline-block"
-        >
-          Go back to Services
-        </Link>
-      </div>
-    );
-  }
-
-  // Image parallax effect styles
-  const imageHeight = 250; // Adjusted height
-  const scrollThreshold = 150; // When effect becomes prominent
-  const imageStyle = {
-    height: `${Math.max(50, imageHeight - scrollPosition * 0.8)}px`, // Ensure min height
-    opacity: Math.max(0.1, 1 - scrollPosition / scrollThreshold), // Ensure min opacity
-    transition: "height 0.1s linear, opacity 0.1s linear", // Faster transition
-  };
-
-  // Render description based on type (string or function)
-  const renderDescriptionContent = () => {
-    const descriptionToShow = showFullDescription
-      ? selectedItem.fullDescription
-      : selectedItem.description;
-    if (typeof descriptionToShow === "function") {
-      return descriptionToShow(); // Call the function if it's JSX
-    } else {
-      // Handle string descriptions with formatting
-      return (
-        <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-          {formatDescription(descriptionToShow || "")}{" "}
-          {/* Ensure it's a string */}
-        </p>
-      );
-    }
-  };
-
-  // Render "What's Included" section data
-  const renderWhatsIncluded = () => {
-    if (!selectedItem.whatsIncluded) return null; // No data
-
-    // Handle array of strings
-    if (Array.isArray(selectedItem.whatsIncluded)) {
-      return (
-        <ul className="list-disc list-inside pl-2 space-y-1 text-gray-700">
-          {selectedItem.whatsIncluded.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      );
-    }
-
-    // Handle object (for sub-sections)
-    if (
-      typeof selectedItem.whatsIncluded === "object" &&
-      !Array.isArray(selectedItem.whatsIncluded)
-    ) {
-      return (
-        <div className="space-y-3">
-          {Object.entries(selectedItem.whatsIncluded).map(
-            ([subHeading, items]) => (
-              <div key={subHeading}>
-                <h4 className="font-semibold text-gray-700 mb-1">
-                  {subHeading}:
-                </h4>
-                <ul className="list-disc list-inside pl-4 space-y-1 text-gray-600">
-                  {Array.isArray(items) ? (
-                    items.map((item, index) => (
-                      <li key={`${subHeading}-${index}`}>{item}</li>
-                    ))
-                  ) : (
-                    <li>Invalid data format for items</li>
-                  )}
-                </ul>
-              </div>
-            )
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <p className="text-red-500">
-        Error: Invalid format for "What's Included".
-      </p>
-    ); // Handle unexpected format
-  };
-
+// ── Mini ImageCarousel (inline, no external dep needed) ───────────────────────
+const MiniCarousel = ({ images }) => {
+  const [idx, setIdx] = useState(0);
+  if (!images?.length) return null;
+  const multi = images.length > 1;
   return (
-    // Modal-like container
-    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col mx-auto my-4 shadow-xl relative border border-gray-200">
-      {/* Scrollable Content Area */}
-      <div
-        ref={detailViewRef}
-        className="flex-grow overflow-y-auto"
-        // style={{ maxHeight: "calc(90vh - 60px)" }} // Max height for scroll area if needed
-      >
-        {/* Image Carousel with Parallax */}
-        {selectedItem.images && selectedItem.images.length > 0 && (
-          <div
-            style={imageStyle}
-            className="overflow-hidden w-full sticky top-0 z-0"
-          >
-            {" "}
-            {/* Sticky image */}
-            <ImageCarousel images={selectedItem.images} />
+    <div style={{ position: "relative", width: "100%", height: "100%", background: "#0d0d12" }}>
+      <img
+        key={idx}
+        src={images[idx]}
+        alt={`Slide ${idx + 1}`}
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        onError={(e) => { e.target.style.opacity = ".3"; }}
+      />
+      {multi && (
+        <>
+          <button onClick={() => setIdx((i) => (i - 1 + images.length) % images.length)}
+            style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", background:"rgba(0,0,0,.45)", border:"none", borderRadius:"50%", width:30, height:30, color:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <ChevronLeft size={15} />
+          </button>
+          <button onClick={() => setIdx((i) => (i + 1) % images.length)}
+            style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", background:"rgba(0,0,0,.45)", border:"none", borderRadius:"50%", width:30, height:30, color:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <ChevronRight size={15} />
+          </button>
+          <div style={{ position:"absolute", bottom:10, left:"50%", transform:"translateX(-50%)", display:"flex", gap:5 }}>
+            {images.map((_, i) => (
+              <button key={i} onClick={() => setIdx(i)}
+                style={{ width: i===idx ? 18 : 6, height:4, borderRadius:999, background:"rgba(255,255,255,.9)", opacity: i===idx ? 1 : .4, border:"none", cursor:"pointer", padding:0, transition:"width .25s" }} />
+            ))}
           </div>
-        )}
-
-        {/* Text Content */}
-        <div className="p-5 md:p-8 relative z-10 bg-white">
-          {" "}
-          {/* Ensure text is above sticky image */}
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">
-            {selectedItem.title}
-          </h2>
-          {selectedItem.price && (
-            <p className="text-xl font-semibold mb-4 text-blue-600">
-              {selectedItem.price}
-            </p>
-          )}
-          {/* Description Area */}
-          <div className="mb-4 prose max-w-none prose-strong:font-semibold">
-            {" "}
-            {/* Using prose for better text styling */}
-            {renderDescriptionContent()}
-          </div>
-          {/* Read More/Less Button */}
-          {(typeof selectedItem.fullDescription === "function" ||
-            (selectedItem.fullDescription &&
-              selectedItem.fullDescription !== selectedItem.description)) && (
-            <button
-              className="text-blue-600 hover:text-blue-800 underline text-sm font-medium mb-4"
-              onClick={toggleDescription}
-            >
-              {showFullDescription ? "Read less" : "Read more"}
-            </button>
-          )}
-          {/* --- WHAT'S INCLUDED SECTION --- */}
-          {selectedItem.whatsIncluded && (
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">
-                What's Included:
-              </h3>
-              {renderWhatsIncluded()}
-            </div>
-          )}
-          {/* --- END WHAT'S INCLUDED --- */}
-          {/* Referral Info */}
-          {selectedItem.referral && (
-            <p className="text-sm text-green-600 mt-5 p-3 bg-green-50 border border-green-200 rounded-md">
-              💰 {selectedItem.referral}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Back Button - Positioned at the bottom */}
-      <div className="p-4 bg-gray-50 border-t border-gray-200 sticky bottom-0 z-20 flex justify-start">
-        <Link
-          to="/MyServices" // Ensure this path matches your routing setup
-          className={`bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors duration-200 flex items-center text-sm shadow`}
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Back to Services
-        </Link>
-      </div>
+        </>
+      )}
     </div>
   );
 };
 
-// --- MAIN SERVICES LIST PAGE ---
-const MyServicesPage = () => {
-  const renderItemList = useCallback(
-    (items, category) => (
-      <div className="mt-4 grid grid-cols-1 gap-4">
-        {items.map((item) => (
-          // Make sure the path here matches your Route definition in App.jsx
-          <Link key={item.id} to={`/services/${category}/${item.id}`}>
-            <div className="flex items-start p-4 bg-white rounded-lg shadow transition-all duration-300 hover:shadow-md border border-transparent hover:border-gray-200">
-              <img
-                src={item.images[0]} // Use first image as thumbnail
-                alt={item.title}
-                className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover flex-shrink-0 mr-4 mt-1" // Added margin-top
-                onError={(e) => {
-                  e.target.src =
-                    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23ddd"/><text x="50" y="50" text-anchor="middle" dy=".3em">No Image</text></svg>';
-                }}
-              />
-              <div className="flex-grow min-w-0">
-                {" "}
-                {/* Added min-w-0 for proper text wrapping */}
-                <h4 className="font-semibold text-base md:text-lg text-gray-800 truncate">
-                  {item.title}
-                </h4>{" "}
-                {/* Added truncate */}
-                <p
-                  className="text-sm text-gray-600 mt-1 overflow-hidden"
-                  style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {" "}
-                  {/* Fixed line-clamp-2 issue */}
-                  {typeof item.description === "string"
-                    ? item.description
-                    : "View details"}
-                </p>
-                {item.price && (
-                  <p className="text-sm font-semibold text-blue-600 mt-2">
-                    {item.price}
-                  </p>
-                )}
-              </div>
-              <ChevronRight className="text-gray-400 ml-2 flex-shrink-0 self-center" />
-            </div>
-          </Link>
-        ))}
-      </div>
-    ),
-    []
-  );
-
-  // Component Render
-  return (
-    // Using a simpler background, letting the parent handle overall background
-    <div className="max-w-3xl mx-auto px-2 sm:px-4 pb-10">
-      {/* Header */}
-      <div className="bg-white p-4 flex items-center shadow-sm sticky top-0 z-30 rounded-b-lg mb-4 border-b border-gray-200">
-        <Link to="/" className="text-gray-600 hover:text-gray-900 mr-3">
-          <ChevronLeft className="w-6 h-6" />
-        </Link>
-        <h1 className="text-xl font-semibold text-gray-800">
-          Bruce's Services
-        </h1>
-      </div>
-
-      {/* Welcome Banner */}
-      <div
-        className="text-white p-6 rounded-lg mb-8 flex flex-col justify-center items-center shadow-lg text-center"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url(${myLogo})`, // Assuming myLogo is appropriate, otherwise use a generic banner image
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          minHeight: "180px",
-        }}
-      >
-        <h2 className="text-2xl font-bold mb-2">
-          Welcome to BruceMinanga's World
-        </h2>
-        <p className="max-w-xl">
-          Hi! I'm Bruce, the IT guy & the owner of this digital realm. Exploring
-          & contributing to technology, philosophy, and more. Let me bring your
-          digital dreams to life (He/him).
-        </p>
-      </div>
-
-      {/* Service Categories */}
-      {Object.entries(MyServicesItems).map(([category, items]) => (
-        <div key={category} className="mb-8">
-          <div className="flex justify-between items-center mb-2 px-1">
-            <h3 className="text-xl font-semibold text-gray-800">
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </h3>
-            {/* Link to Category Page (if you implement one) */}
-            {/* <Link to={`/category/${category}`} className="text-blue-600 hover:underline text-sm font-medium">See all</Link> */}
-          </div>
-          {/* Render first few items */}
-          {renderItemList(items.slice(0, 4), category)}{" "}
-          {/* Show up to 4 items initially */}
-          {/* Add a "See More" if applicable */}
-          {/* {items.length > 4 && <Link to={`/category/${category}`} className="...">See all {category}</Link>} */}
+// ── WhatsIncluded renderer ────────────────────────────────────────────────────
+const WhatsIncluded = ({ data }) => {
+  if (!data) return null;
+  if (Array.isArray(data)) return (
+    <div className="dv-included-group">
+      {data.map((item, i) => (
+        <div key={i} className="dv-included-item">
+          <div className="dv-included-dot" />
+          <span>{item}</span>
         </div>
       ))}
     </div>
   );
+  if (typeof data === "object") return (
+    <>
+      {Object.entries(data).map(([heading, items]) => (
+        <div key={heading} className="dv-included-group">
+          <p className="dv-included-group-head">{heading}</p>
+          {Array.isArray(items) && items.map((item, i) => (
+            <div key={i} className="dv-included-item">
+              <div className="dv-included-dot" />
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
+  );
+  return null;
 };
 
-// --- CORRECTED EXPORT ---
-// Only the default export is needed here.
-// ItemDetailView is already exported above using 'export const'.
+// ── Item Detail View ──────────────────────────────────────────────────────────
+export const ItemDetailView = () => {
+  const { category, id } = useParams();
+  const [expanded, setExpanded] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const scrollRef = useRef(null);
+
+  const item = (MyServicesItems[category] || []).find((i) => i.id === id);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => setScrollY(el.scrollTop);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (!item) return (
+    <>
+      <style>{GLOBAL_STYLES}</style>
+      <div className="dv-notfound">
+        <h2>Item not found</h2>
+        <Link to="/MyServices" className="dv-back-link"><ChevronLeft size={15} /> Back to Services</Link>
+      </div>
+    </>
+  );
+
+  const imgH = Math.max(60, 280 - scrollY * 0.7);
+  const imgOp = Math.max(0.15, 1 - scrollY / 200);
+  const hasMore = item.fullDescription && item.fullDescription !== item.description;
+
+  return (
+    <>
+      <style>{GLOBAL_STYLES}</style>
+      <div className="dv-root" ref={scrollRef} style={{ maxHeight: "100svh", overflowY: "auto" }}>
+        {/* Sticky hero image */}
+        {item.images?.length > 0 && (
+          <div className="dv-image-wrap" style={{ height: imgH, opacity: imgOp }}>
+            <MiniCarousel images={item.images} />
+          </div>
+        )}
+
+        {/* Content card */}
+        <div className="dv-body">
+          {/* Pills row */}
+          <div className="dv-pill-row">
+            <span className="dv-cat-pill">{category}</span>
+            {item.price && (
+              <span className="dv-price-pill"><Tag size={11} />{item.price}</span>
+            )}
+          </div>
+
+          <h2 className="dv-title">{item.title}</h2>
+
+          {/* Description */}
+          <div className="dv-desc">
+            {formatDescription(expanded ? item.fullDescription : item.description)}
+          </div>
+
+          {hasMore && (
+            <button className="dv-toggle" onClick={() => setExpanded((p) => !p)}>
+              {expanded ? <><BookMarked size={13} /> Read less</> : <><BookOpen size={13} /> Read more</>}
+            </button>
+          )}
+
+          {/* What's included */}
+          {item.whatsIncluded && (
+            <div className="dv-included">
+              <p className="dv-included-title">What's Included</p>
+              <WhatsIncluded data={item.whatsIncluded} />
+            </div>
+          )}
+
+          {/* Referral */}
+          {item.referral && (
+            <div className="dv-referral">
+              <Gift size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+              <span>{item.referral}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="dv-footer">
+          <Link to="/MyServices" className="dv-back-link">
+            <ChevronLeft size={15} /> Back to Services
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// ── Main Services Page ────────────────────────────────────────────────────────
+const MyServicesPage = () => {
+  return (
+    <>
+      <style>{GLOBAL_STYLES}</style>
+      <div style={{ maxWidth: 680, margin: "0 auto", paddingBottom: 48 }}>
+
+        {/* Top bar */}
+        <header className="ms-topbar">
+          <Link to="/" className="ms-back-btn" aria-label="Go home">
+            <ChevronLeft size={18} />
+          </Link>
+          <span className="ms-topbar-title">Bruce's World</span>
+        </header>
+
+        <div style={{ padding: "20px 16px 0" }}>
+          {/* Hero banner */}
+          <div className="ms-hero">
+            <img src={myLogo} alt="Bruce Minanga" className="ms-hero-img" />
+            <div className="ms-hero-scrim" />
+            <div className="ms-hero-content">
+              <h2 className="ms-hero-title">Welcome to<br />BruceMinanga's World</h2>
+              <p className="ms-hero-sub">
+                Hi, I'm Bruce — IT guy, thinker, builder. Exploring technology, philosophy, and more.
+                Let me bring your digital dreams to life. <em>He/him</em>.
+              </p>
+            </div>
+          </div>
+
+          {/* Category sections */}
+          {Object.entries(MyServicesItems).map(([cat, items], ci) => (
+            <React.Fragment key={cat}>
+              {ci > 0 && <div className="ms-divider" />}
+              <section style={{ marginBottom: 8 }}>
+                <div className="ms-section-head">
+                  <h3 className="ms-section-title">
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </h3>
+                  <span className="ms-section-count">{items.length}</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {items.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={`/services/${cat}/${item.id}`}
+                      className="ms-card"
+                    >
+                      <img
+                        src={item.images[0]}
+                        alt={item.title}
+                        className="ms-thumb"
+                        loading="lazy"
+                        onError={(e) => { e.target.style.opacity = ".4"; }}
+                      />
+                      <div style={{ minWidth: 0 }}>
+                        <p className="ms-card-title">{item.title}</p>
+                        <p className="ms-card-snippet">{item.description}</p>
+                        {item.price && (
+                          <span className="ms-price-pill">{item.price}</span>
+                        )}
+                      </div>
+                      <ChevronRight className="ms-chevron" size={18} />
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
+
 export default MyServicesPage;
